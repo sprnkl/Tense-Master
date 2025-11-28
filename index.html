@@ -162,31 +162,37 @@
       { base: "send", past: "sent", pp: "sent", ing: "sending", inf: "to send", obj: "an email" },
       { base: "show", past: "showed", pp: "shown", ing: "showing", inf: "to show", obj: "the way" },
       { base: "sing", past: "sang", pp: "sung", ing: "singing", inf: "to sing", obj: "a song" },
-      { base: "sit", past: "sat", pp: "sat", ing: "sitting", inf: "to sit", obj: "on the chair" },
-      { base: "sleep", past: "slept", pp: "slept", ing: "sleeping", inf: "to sleep", obj: "well" },
+      { base: "sit", past: "sat", pp: "sat", ing: "sitting", inf: "to sit" },
+      { base: "sleep", past: "slept", pp: "slept", ing: "sleeping", inf: "to sleep" },
       { base: "speak", past: "spoke", pp: "spoken", ing: "speaking", inf: "to speak", obj: "German" },
       { base: "spend", past: "spent", pp: "spent", ing: "spending", inf: "to spend", obj: "time" },
-      { base: "stand", past: "stood", pp: "stood", ing: "standing", inf: "to stand", obj: "up" },
+      { base: "stand", past: "stood", pp: "stood", ing: "standing", inf: "to stand" },
       { base: "start", past: "started", pp: "started", ing: "starting", inf: "to start", obj: "the game" },
-      { base: "study", past: "studied", pp: "studied", ing: "studying", inf: "to study", obj: "maths" },
-      { base: "swim", past: "swam", pp: "swum", ing: "swimming", inf: "to swim", obj: "in the lake" },
+      { base: "study", past: "studied", pp: "studied", ing: "studying", inf: "to study" },
+      { base: "swim", past: "swam", pp: "swum", ing: "swimming", inf: "to swim" },
       { base: "take", past: "took", pp: "taken", ing: "taking", inf: "to take", obj: "the bus" },
-      { base: "talk", past: "talked", pp: "talked", ing: "talking", inf: "to talk", obj: "to the teacher" },
-      { base: "teach", past: "taught", pp: "taught", ing: "teaching", inf: "to teach", obj: "students" },
+      { base: "talk", past: "talked", pp: "talked", ing: "talking", inf: "to talk" },
+      { base: "teach", past: "taught", pp: "taught", ing: "teaching", inf: "to teach" },
       { base: "tell", past: "told", pp: "told", ing: "telling", inf: "to tell", obj: "a story" },
       { base: "think", past: "thought", pp: "thought", ing: "thinking", inf: "to think", obj: "about it" },
-      { base: "travel", past: "travelled", pp: "travelled", ing: "travelling", inf: "to travel", obj: "around the world" },
-      { base: "try", past: "tried", pp: "tried", ing: "trying", inf: "to try", obj: "hard" },
-      { base: "turn", past: "turned", pp: "turned", ing: "turning", inf: "to turn", obj: "around" },
+      { base: "travel", past: "travelled", pp: "travelled", ing: "travelling", inf: "to travel" },
+      { base: "try", past: "tried", pp: "tried", ing: "trying", inf: "to try" },
+      { base: "turn", past: "turned", pp: "turned", ing: "turning", inf: "to turn" },
       { base: "use", past: "used", pp: "used", ing: "using", inf: "to use", obj: "a computer" },
       { base: "wait", past: "waited", pp: "waited", ing: "waiting", inf: "to wait", obj: "for the bus" },
-      { base: "walk", past: "walked", pp: "walked", ing: "walking", inf: "to walk", obj: "to school" },
+      { base: "walk", past: "walked", pp: "walked", ing: "walking", inf: "to walk" },
       { base: "watch", past: "watched", pp: "watched", ing: "watching", inf: "to watch", obj: "TV" },
-      { base: "work", past: "worked", pp: "worked", ing: "working", inf: "to work", obj: "hard" }
+      { base: "work", past: "worked", pp: "worked", ing: "working", inf: "to work" }
     ];
 
+    // Einige Verben haben keine direkten Objekte oben bekommen (z.B. sit, sleep),
+    // daher ergänze ich hier eine Fallback-Logik oder leere Strings, damit "undefined" nicht angezeigt wird.
+    verbs.forEach(v => {
+      if(!v.obj) v.obj = "";
+    });
+
     // =====================
-    // Subjekte (Bereinigt um unlogische wie "the dog" oder "it" für universelle Nutzung)
+    // Subjekte (BEREINIGT: Keine Tiere/Dinge, die unlogische Handlungen ausführen)
     // =====================
     const subjects = [
       { label: "I",            bePres: "am",  bePast: "was",  havePres: "have", is3sg: false },
@@ -232,7 +238,7 @@
       for (let i = 0; i < 100; i++) {
         const verb = verbs[i];
         const subj = subjects[i % subjects.length];
-        const obj = verb.obj; // Kontext holen
+        const obj = verb.obj;
         if (i < 34) {
           const time = timePhrases[i % timePhrases.length];
           const base = verb.base;
