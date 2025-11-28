@@ -105,6 +105,11 @@
       { label: "the children", bePres: "are", bePast: "were", havePres: "have", is3sg: false }
     ];
 
+    // Hinweis für dich als Lehrer:
+    // Wenn du neue regelmäßige Verben ergänzt (z.B. stop, plan),
+    // trag bitte die korrekten Formen (Past, -ing, 3. Form) direkt hier ein.
+    // So bleiben auch Spezialfälle (stopped, travelling) orthografisch sauber,
+    // ohne dass komplizierte Rechtschreiblogik im Code nötig ist.
     const verbsRegular = [
       { infLabel: "to play",   base: "play",   past: "played",   pp: "played",   ing: "playing"   },
       { infLabel: "to watch",  base: "watch",  past: "watched",  pp: "watched",  ing: "watching"  },
@@ -119,16 +124,16 @@
     ];
 
     const verbsIrregular = [
-      { infLabel: "to go",    base: "go",    past: "went",   pp: "gone",     ing: "going"    },
-      { infLabel: "to have",  base: "have",  past: "had",    pp: "had",      ing: "having"   },
-      { infLabel: "to do",    base: "do",    past: "did",    pp: "done",     ing: "doing"    },
-      { infLabel: "to eat",   base: "eat",   past: "ate",    pp: "eaten",    ing: "eating"   },
-      { infLabel: "to see",   base: "see",   past: "saw",    pp: "seen",     ing: "seeing"   },
-      { infLabel: "to make",  base: "make",  past: "made",   pp: "made",     ing: "making"   },
-      { infLabel: "to take",  base: "take",  past: "took",   pp: "taken",    ing: "taking"   },
-      { infLabel: "to come",  base: "come",  past: "came",   pp: "come",     ing: "coming"   },
-      { infLabel: "to buy",   base: "buy",   past: "bought", pp: "bought",   ing: "buying"   },
-      { infLabel: "to write", base: "write", past: "wrote",  pp: "written",  ing: "writing"  }
+      { infLabel: "to go",    base: "go",    past: "went",  pp: "gone",    ing: "going"   },
+      { infLabel: "to have",  base: "have",  past: "had",   pp: "had",     ing: "having"  },
+      { infLabel: "to do",    base: "do",    past: "did",   pp: "done",    ing: "doing"   },
+      { infLabel: "to eat",   base: "eat",   past: "ate",   pp: "eaten",   ing: "eating"  },
+      { infLabel: "to see",   base: "see",   past: "saw",   pp: "seen",    ing: "seeing"  },
+      { infLabel: "to make",  base: "make",  past: "made",  pp: "made",    ing: "making"  },
+      { infLabel: "to take",  base: "take",  past: "took",  pp: "taken",   ing: "taking"  },
+      { infLabel: "to come",  base: "come",  past: "came",  pp: "come",    ing: "coming"  },
+      { infLabel: "to buy",   base: "buy",   past: "bought",pp: "bought",  ing: "buying"  },
+      { infLabel: "to write", base: "write", past: "wrote", pp: "written", ing: "writing" }
     ];
 
     const verbsAll = verbsRegular.concat(verbsIrregular);
@@ -521,48 +526,63 @@
     }
 
     // =====================================
-    // Generatoren für Grammatik-Themen (50)
+    // Grammatik-Themen (50 Items) – erweitert
     // =====================================
 
     function generateIfClausesPractice() {
       const items = [];
-      // Type 1
-      const base1 = [
+
+      const type1Templates = [
         { q: "If it _____ (to rain), we will stay at home.", a: "rains", hint: "If + Simple Present, will + Infinitiv" },
-        { q: "If you study, you _____ (to pass) the test.", a: "will pass", hint: "Hauptsatz mit will" },
-        { q: "If she _____ (to call) me, I will be happy.", a: "calls", hint: "Simple Present" }
+        { q: "If you _____ (to study), you will pass the test.", a: "study", hint: "If-Teil im Simple Present" },
+        { q: "If she _____ (to call) me, I will be happy.", a: "calls", hint: "he/she/it + s" },
+        { q: "If they _____ (to hurry), they will catch the bus.", a: "hurry", hint: "Grundform im If-Teil" },
+        { q: "If we don't eat, we _____ (to be) hungry.", a: "will be", hint: "Hauptsatz: will + Grundform" },
+        { q: "If you _____ (to drink) too much coke, you will feel bad.", a: "drink", hint: "Simple Present" },
+        { q: "If the sun _____ (to shine), we will go to the beach.", a: "shines", hint: "he/she/it + s" },
+        { q: "If I have time, I _____ (to help) you.", a: "will help", hint: "will + Grundform" },
+        { q: "If you are tired, you _____ (to go) to bed.", a: "can go", hint: "kann auch anderes Modalverb sein" },
+        { q: "If it gets cold, I _____ (to put on) my jacket.", a: "will put on", hint: "will + Grundform" }
       ];
-      base1.forEach(b => items.push({ type: "type1", ...b }));
 
-      // Type 2
-      const base2 = [
+      const type2Templates = [
         { q: "If I _____ (to have) more money, I would buy a car.", a: "had", hint: "If + Simple Past, would + Infinitiv" },
-        { q: "If he were taller, he _____ (to play) basketball.", a: "would play", hint: "would + Grundform" },
-        { q: "If they _____ (to live) in London, they would speak English every day.", a: "lived", hint: "Simple Past" }
+        { q: "If he _____ (to be) taller, he would play basketball.", a: "were", hint: "If I/he/she/it were ..." },
+        { q: "If they _____ (to live) in London, they would speak English every day.", a: "lived", hint: "Simple Past" },
+        { q: "If we _____ (to win) the lottery, we would travel the world.", a: "won", hint: "Irregular: win → won" },
+        { q: "If she _____ (to know) his number, she would call him.", a: "knew", hint: "Simple Past" },
+        { q: "If I were you, I _____ (to talk) to the teacher.", a: "would talk", hint: "would + Grundform" },
+        { q: "If it _____ (to rain), we would stay at home.", a: "rained", hint: "Unwahrscheinliche Bedingung" },
+        { q: "If they had a car, they _____ (to drive) to school.", a: "would drive", hint: "would + Grundform" },
+        { q: "If Tom _____ (to be) older, he would go to that party.", a: "were", hint: "If Tom were ..." },
+        { q: "If we _____ (to have) more time, we would visit you.", a: "had", hint: "Simple Past" }
       ];
-      base2.forEach(b => items.push({ type: "type2", ...b }));
 
-      // Type 3
-      const base3 = [
+      const type3Templates = [
         { q: "If she _____ (to study) harder, she would have passed the exam.", a: "had studied", hint: "If + Past Perfect" },
         { q: "If we had left earlier, we _____ (to catch) the train.", a: "would have caught", hint: "would have + 3. Form" },
-        { q: "If I _____ (to know) that, I would have helped you.", a: "had known", hint: "Past Perfect" }
+        { q: "If I _____ (to know) that, I would have helped you.", a: "had known", hint: "Past Perfect" },
+        { q: "If they _____ (to listen) to the teacher, they wouldn't have made this mistake.", a: "had listened", hint: "If + Past Perfect" },
+        { q: "If he had called me, I _____ (to go) to the party.", a: "would have gone", hint: "would have + 3. Form" },
+        { q: "If it _____ (to rain), the match would have been cancelled.", a: "had rained", hint: "If-Teil: Past Perfect" },
+        { q: "If we had taken a taxi, we _____ (to arrive) on time.", a: "would have arrived", hint: "would have + 3. Form" },
+        { q: "If you _____ (to tell) me earlier, I could have helped you.", a: "had told", hint: "If + Past Perfect" },
+        { q: "If they had prepared better, they _____ (not / to fail) the exam.", a: "wouldn't have failed", hint: "wouldn't have + 3. Form" },
+        { q: "If I _____ (to see) her, I would have said hello.", a: "had seen", hint: "Past Perfect" }
       ];
-      base3.forEach(b => items.push({ type: "type3", ...b }));
 
-      // rest auffüllen mit Variationen
-      const templates = [
-        { type: "type1", q: "If you _____ (to hurry), you will catch the bus.", a: "hurry", hint: "If-Teil: Simple Present" },
-        { type: "type1", q: "If they don't eat, they _____ (to be) hungry.", a: "will be", hint: "Hauptsatz: will be" },
-        { type: "type2", q: "If she _____ (to be) older, she would drive a car.", a: "were", hint: "If-Teil: Simple Past" },
-        { type: "type2", q: "If we _____ (to win) the lottery, we would travel the world.", a: "won", hint: "Simple Past" },
-        { type: "type3", q: "If you _____ (to listen) to me, you wouldn't have made this mistake.", a: "had listened", hint: "If-Teil: Past Perfect" },
-        { type: "type3", q: "If they had studied, they _____ (to pass) the test.", a: "would have passed", hint: "would have + 3. Form" }
-      ];
       let i = 0;
       while (items.length < 50) {
-        const t = templates[i % templates.length];
-        items.push({ type: t.type, q: t.q, a: t.a, hint: t.hint });
+        if (items.length % 3 === 0) {
+          const t = type1Templates[i % type1Templates.length];
+          items.push({ type: "type1", q: t.q, a: t.a, hint: t.hint });
+        } else if (items.length % 3 === 1) {
+          const t = type2Templates[i % type2Templates.length];
+          items.push({ type: "type2", q: t.q, a: t.a, hint: t.hint });
+        } else {
+          const t = type3Templates[i % type3Templates.length];
+          items.push({ type: "type3", q: t.q, a: t.a, hint: t.hint });
+        }
         i++;
       }
       return items;
@@ -571,14 +591,21 @@
     function generateComparativesPractice() {
       const items = [];
       const adjectives = [
-        { base: "tall", comp: "taller", sup: "the tallest" },
-        { base: "small", comp: "smaller", sup: "the smallest" },
-        { base: "fast", comp: "faster", sup: "the fastest" },
-        { base: "interesting", comp: "more interesting", sup: "the most interesting" },
-        { base: "good", comp: "better", sup: "the best" },
-        { base: "bad", comp: "worse", sup: "the worst" },
-        { base: "cheap", comp: "cheaper", sup: "the cheapest" },
-        { base: "important", comp: "more important", sup: "the most important" }
+        { base: "tall",        comp: "taller",             sup: "the tallest" },
+        { base: "small",       comp: "smaller",            sup: "the smallest" },
+        { base: "fast",        comp: "faster",             sup: "the fastest" },
+        { base: "slow",        comp: "slower",             sup: "the slowest" },
+        { base: "old",         comp: "older",              sup: "the oldest" },
+        { base: "young",       comp: "younger",            sup: "the youngest" },
+        { base: "interesting", comp: "more interesting",   sup: "the most interesting" },
+        { base: "boring",      comp: "more boring",        sup: "the most boring" },
+        { base: "good",        comp: "better",             sup: "the best" },
+        { base: "bad",         comp: "worse",              sup: "the worst" },
+        { base: "cheap",       comp: "cheaper",            sup: "the cheapest" },
+        { base: "expensive",   comp: "more expensive",     sup: "the most expensive" },
+        { base: "important",   comp: "more important",     sup: "the most important" },
+        { base: "short",       comp: "shorter",            sup: "the shortest" },
+        { base: "strong",      comp: "stronger",           sup: "the strongest" }
       ];
       let i = 0;
       while (items.length < 25) {
@@ -613,7 +640,16 @@
         { q: "Where _____ (they / to live)?", a: "do they live", hint: "Fragewort + do/does" },
         { q: "When _____ (he / to get up)?", a: "does he get up", hint: "When + does + he" },
         { q: "_____ (you / to go) to school yesterday?", a: "Did you go", hint: "Did + Grundform" },
-        { q: "Why _____ (she / to cry) yesterday?", a: "did she cry", hint: "Why + did + she" }
+        { q: "Why _____ (she / to cry) yesterday?", a: "did she cry", hint: "Why + did + she" },
+        { q: "_____ (they / to be) at home yesterday?", a: "Were they", hint: "to be im Simple Past" },
+        { q: "Where _____ (she / to be) now?", a: "is she", hint: "Fragewort + be" },
+        { q: "What _____ (you / to do) now?", a: "are you doing", hint: "Present Progressive: be + Verb-ing" },
+        { q: "What _____ (she / to do) at the moment?", a: "is she doing", hint: "is + she + Verb-ing" },
+        { q: "How long _____ (you / to live) here?", a: "have you lived", hint: "Present Perfect Frage" },
+        { q: "_____ (he / to have) a dog?", a: "Does he have", hint: "have als Vollverb" },
+        { q: "Who _____ (to help) you with your homework?", a: "helps", hint: "Who + Verb (kein do/does)" },
+        { q: "What time _____ (the film / to start)?", a: "does the film start", hint: "Fragewort + does" },
+        { q: "Why _____ (they / to be) late?", a: "are they", hint: "be vor dem Subjekt" }
       ];
       let i = 0;
       while (items.length < 50) {
@@ -628,11 +664,17 @@
       const items = [];
       const templates = [
         { q: "You _____ (can) swim very well.", a: "can", hint: "Modalverb + Grundform" },
-        { q: "She _____ (must) do her homework.", a: "must", hint: "muss" },
-        { q: "We _____ (should) help our parents.", a: "should", hint: "sollten" },
-        { q: "They _____ (must not) be late.", a: "must not", hint: "mustn't = must not" },
-        { q: "I _____ (may) go to the party.", a: "may", hint: "may = vielleicht dürfen" },
-        { q: "You _____ (should not) eat so much fast food.", a: "should not", hint: "shouldn't" }
+        { q: "She _____ (must) do her homework.", a: "must", hint: "starke Pflicht" },
+        { q: "We _____ (should) help our parents.", a: "should", hint: "Rat geben" },
+        { q: "They _____ (must not) be late.", a: "must not", hint: "Verbot: mustn't" },
+        { q: "I _____ (may) go to the party.", a: "may", hint: "vielleicht dürfen" },
+        { q: "You _____ (should not) eat so much fast food.", a: "should not", hint: "shouldn't" },
+        { q: "He _____ (can't) play the piano.", a: "can't", hint: "can not" },
+        { q: "We _____ (might) see him tomorrow.", a: "might", hint: "vielleicht (unsicherer als may)" },
+        { q: "You _____ (must) wear a helmet.", a: "must", hint: "Regel oder Gesetz" },
+        { q: "Students _____ (must not) use their phones in the exam.", a: "must not", hint: "strenges Verbot" },
+        { q: "You _____ (can) ask your teacher for help.", a: "can", hint: "Erlaubnis / Möglichkeit" },
+        { q: "She _____ (should) drink more water.", a: "should", hint: "Gesundheitstipp" }
       ];
       let i = 0;
       while (items.length < 50) {
@@ -651,7 +693,11 @@
         { q: "She has too _____ homework.", a: "much", hint: "uncountable -> much" },
         { q: "There are _____ books on the table.", a: "many", hint: "Plural -> many" },
         { q: "We don't have _____ time.", a: "much", hint: "time = uncountable" },
-        { q: "I have _____ friends in London.", a: "many", hint: "friends = plural" }
+        { q: "I have _____ friends in London.", a: "many", hint: "friends = plural" },
+        { q: "How _____ sugar do you put in your tea?", a: "much", hint: "sugar = uncountable" },
+        { q: "How _____ students are in your class?", a: "many", hint: "students = plural" },
+        { q: "There isn't _____ milk left in the fridge.", a: "much", hint: "milk = uncountable" },
+        { q: "He has _____ CDs at home.", a: "many", hint: "CDs = plural" }
       ];
       let i = 0;
       while (items.length < 50) {
@@ -665,11 +711,66 @@
     function generateWordOrderPractice() {
       const items = [];
       const templates = [
-        { q: "She _____ (always) does her homework in the evening.", a: "always", hint: "Adverb of frequency vor dem Vollverb" },
-        { q: "They go to school _____ (usually) by bus.", a: "usually", hint: "Adverb vor dem Rest des Satzes" },
-        { q: "_____ (Sometimes) I read books in bed.", a: "Sometimes", hint: "Adverb am Satzanfang möglich" },
-        { q: "We are _____ (never) late for school.", a: "never", hint: "Adverb nach be" },
-        { q: "Tom is _____ (often) tired in the morning.", a: "often", hint: "Adverb nach be" }
+        {
+          q: "Ordne die Wörter zu einem richtigen Satz:
+(always / does / her homework / she / in the evening)",
+          a: "She always does her homework in the evening.",
+          hint: "Reihenfolge: Subjekt – Adverb – Verb – Rest."
+        },
+        {
+          q: "Ordne die Wörter:
+(often / we / play / football / after school)",
+          a: "We often play football after school.",
+          hint: "Adverb der Häufigkeit vor dem Vollverb."
+        },
+        {
+          q: "Ordne die Wörter:
+(never / is / he / late / for school)",
+          a: "He is never late for school.",
+          hint: "Adverb nach Formen von be (am/is/are)."
+        },
+        {
+          q: "Ordne die Wörter:
+(in the morning / I / usually / get up / at 7 o'clock)",
+          a: "I usually get up at 7 o'clock in the morning.",
+          hint: "Zeitangaben meist am Ende oder Anfang."
+        },
+        {
+          q: "Ordne die Wörter:
+(English / on Mondays / we / have / always)",
+          a: "We always have English on Mondays.",
+          hint: "Subjekt – Adverb – Verb – Objekt – Zeit."
+        },
+        {
+          q: "Ordne die Wörter:
+(sometimes / in the park / they / play / football)",
+          a: "They sometimes play football in the park.",
+          hint: "Ort oft vor der Zeit."
+        },
+        {
+          q: "Ordne die Wörter:
+(at the weekend / go / we / usually / to my grandma's house)",
+          a: "We usually go to my grandma's house at the weekend.",
+          hint: "Häufigkeitsadverb vor dem Vollverb."
+        },
+        {
+          q: "Ordne die Wörter:
+(in the afternoon / is / very tired / my father / often)",
+          a: "My father is often very tired in the afternoon.",
+          hint: "Adverb nach be."
+        },
+        {
+          q: "Ordne die Wörter:
+(always / wears / at school / she / her school uniform)",
+          a: "She always wears her school uniform at school.",
+          hint: "Subjekt – Adverb – Verb – Objekt – Ort."
+        },
+        {
+          q: "Ordne die Wörter:
+(watches / in the evening / TV / usually / he)",
+          a: "He usually watches TV in the evening.",
+          hint: "Häufigkeit vor dem Vollverb."
+        }
       ];
       let i = 0;
       while (items.length < 50) {
@@ -683,11 +784,21 @@
     function generateReportedSpeechPractice() {
       const items = [];
       const templates = [
-        { q: 'She said, "I am tired." -> She said that she _____ tired.', a: "was", hint: "am -> was (eine Zeit zurück)" },
-        { q: 'He said, "I like football." -> He said that he _____ football.', a: "liked", hint: "Simple Present -> Simple Past" },
-        { q: 'They said, "We are going to London." -> They said that they _____ going to London.', a: "were", hint: "are -> were" },
-        { q: 'She said, "I have finished." -> She said that she _____ finished.', a: "had", hint: "have/has -> had" },
-        { q: 'Tom said, "I will help you." -> Tom said that he _____ help me.', a: "would", hint: "will -> would" }
+        { q: 'She said, "I am tired." → She said that she _____ tired.', a: "was", hint: "am → was" },
+        { q: 'He said, "I like football." → He said that he _____ football.', a: "liked", hint: "Simple Present → Simple Past" },
+        { q: 'They said, "We are going to London." → They said that they _____ going to London.', a: "were", hint: "are → were" },
+        { q: 'She said, "I have finished." → She said that she _____ finished.', a: "had", hint: "have → had" },
+        { q: 'Tom said, "I will help you." → Tom said that he _____ help me.', a: "would", hint: "will → would" },
+        { q: 'He said, "I can swim." → He said that he _____ swim.', a: "could", hint: "can → could" },
+        { q: 'She said, "I must go now." → She said that she _____ go then.', a: "had to", hint: "must → had to" },
+        { q: 'They said, "We are happy." → They said that they _____ happy.', a: "were", hint: "are → were" },
+        { q: 'She said, "I don't know." → She said that she _____ know.', a: "didn't", hint: "don't → didn't" },
+        { q: 'He said, "I saw her yesterday." → He said that he had seen her _____.', a: "the day before", hint: "yesterday → the day before" },
+        { q: 'She said, "I will see you tomorrow." → She said that she would see me _____.', a: "the next day", hint: "tomorrow → the next day" },
+        { q: 'He asked, "Where do you live?" → He asked where I _____ .', a: "lived", hint: "do + live → lived" },
+        { q: 'She asked, "Do you like apples?" → She asked if I _____ apples.', a: "liked", hint: "Do you like → if I liked" },
+        { q: 'They asked, "Are you ready?" → They asked if I _____ ready.', a: "was", hint: "are → was" },
+        { q: 'He asked, "Can you help me?" → He asked if I _____ help him.', a: "could", hint: "can → could" }
       ];
       let i = 0;
       while (items.length < 50) {
@@ -735,7 +846,7 @@
           bullets: [
             "Regelmäßige Handlungen: Dinge, die du immer wieder tust.",
             "Fakten: Dinge, die immer wahr sind.",
-            "Fahrpläne/Pläne: 'The train leaves at 7.'"
+            "Fahrpläne/Pläne: "The train leaves at 7.""
           ],
           positive: {
             title: "Aussagesätze",
@@ -1354,8 +1465,8 @@
             rule: "say / tell + that-Satz, Zeitstufe zurück",
             explanation: "Bei tell brauchst du eine Person: He told me that ...",
             examples: [
-              "'I am tired.' → She said that she was tired.",
-              "'We like football.' → They said that they liked football."
+              ""I am tired." → She said that she was tired.",
+              ""We like football." → They said that they liked football."
             ]
           },
           negative: {
@@ -1363,8 +1474,8 @@
             rule: "am / is → was, are → were, Simple Present → Simple Past, will → would",
             explanation: "Wenn das Einleitungsverb in der Vergangenheit steht (said, told), rückt die Zeitstufe zurück.",
             examples: [
-              "'I will help you.' → He said that he would help me.",
-              "'I have finished.' → She said that she had finished."
+              ""I will help you." → He said that he would help me.",
+              ""I have finished." → She said that she had finished."
             ]
           },
           question: {
@@ -1372,8 +1483,8 @@
             rule: "Fragewort + if / whether + normale Satzstellung",
             explanation: "Kein Fragezeichen und keine Inversion mehr.",
             examples: [
-              "'Where do you live?' → She asked where I lived.",
-              "'Do you like apples?' → He asked if I liked apples."
+              ""Where do you live?" → She asked where I lived.",
+              ""Do you like apples?" → He asked if I liked apples."
             ]
           }
         },
@@ -1552,7 +1663,7 @@
                 }">
                   ${item.type === "neg" ? "Verneinung" : item.type === "ques" ? "Frage" : "Aussage"}
                 </div>` : ""}
-                <p class="text-lg mb-3 font-medium text-slate-700 leading-relaxed pr-8">${item.q}</p>
+                <p class="whitespace-pre-line text-lg mb-3 font-medium text-slate-700 leading-relaxed pr-8">${item.q}</p>
                 <div class="flex gap-2">
                   <input type="text"
                          id="input-${idx}"
@@ -1613,17 +1724,17 @@
       const btns = document.querySelectorAll(".filter-btn");
       btns.forEach(btn => {
         const filter = btn.getAttribute("data-filter");
+        btn.onclick = () => {
+          currentPracticeFilter = filter;
+          currentQuestions = [];
+          renderContent();
+        };
         if (filter === currentPracticeFilter) {
           btn.classList.add("bg-slate-800", "text-white", "border-slate-800");
-          btn.classList.remove("bg-white", "text-slate-600");
+          btn.classList.remove("bg-white", "text-slate-600", "border-slate-200");
         } else {
           btn.classList.remove("bg-slate-800", "text-white", "border-slate-800");
           btn.classList.add("bg-white", "text-slate-600", "border-slate-200");
-          btn.onclick = () => {
-            currentPracticeFilter = filter;
-            currentQuestions = [];
-            renderContent();
-          };
         }
       });
     }
