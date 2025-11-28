@@ -20,21 +20,22 @@
   <style>
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .fade-in { animation: fadeIn 0.4s ease-out; }
+    .fade-in { animation: fadeIn 0.3s ease-out; }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden">
+  <!-- HEADER -->
   <header class="bg-white shadow-sm z-20 flex-none">
     <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center gap-3">
         <span class="material-symbols-outlined text-primary text-3xl">school</span>
         <div>
           <h1 class="text-xl font-bold text-primary tracking-tight">Grammar Master</h1>
-          <p class="text-xs text-slate-500">Tenses & Grammar Trainer</p>
+          <p class="text-xs text-slate-500">Tenses & Grammar Trainer (100 Verben)</p>
         </div>
       </div>
       <div class="flex items-center gap-3 text-xs">
@@ -57,25 +58,19 @@
     </div>
   </header>
 
+  <!-- MAIN -->
   <main class="flex-grow overflow-y-auto p-4 relative" id="main-content"></main>
 
-  <div id="floating-action-container" class="fixed bottom-6 left-4 right-4 z-30 hidden">
+  <!-- FOOTER ACTION -->
+  <div id="floating-action-container" class="fixed bottom-4 left-4 right-4 z-30 hidden">
     <div class="max-w-3xl mx-auto flex flex-col gap-2">
       <div id="tense-filter-bar" class="hidden bg-white border border-slate-200 rounded-2xl shadow-sm px-3 py-2 flex items-center justify-between text-xs">
         <span class="font-semibold text-slate-500 mr-2">Übungstyp:</span>
         <div class="flex gap-1">
-          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold"
-                  data-filter="all"
-          >Alle gemischt</button>
-          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold"
-                  data-filter="pos"
-          >Aussagen</button>
-          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold"
-                  data-filter="neg"
-          >Verneinungen</button>
-          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold"
-                  data-filter="ques"
-          >Fragen</button>
+          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold" data-filter="all">Alle</button>
+          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold" data-filter="pos">Aussagen</button>
+          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold" data-filter="neg">Verneinungen</button>
+          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold" data-filter="ques">Fragen</button>
         </div>
       </div>
       <button onclick="reloadQuestions()"
@@ -87,9 +82,115 @@
   </div>
 
   <script>
-    // ============================
-    // Datenbasis: Subjekte / Verben
-    // ============================
+    // =====================
+    // 100 VERBEN (mit Formen)
+    // =====================
+    const verbs = [
+      { base: "accept", past: "accepted", pp: "accepted", ing: "accepting", inf: "to accept" },
+      { base: "add", past: "added", pp: "added", ing: "adding", inf: "to add" },
+      { base: "answer", past: "answered", pp: "answered", ing: "answering", inf: "to answer" },
+      { base: "ask", past: "asked", pp: "asked", ing: "asking", inf: "to ask" },
+      { base: "bake", past: "baked", pp: "baked", ing: "baking", inf: "to bake" },
+      { base: "bring", past: "brought", pp: "brought", ing: "bringing", inf: "to bring" },
+      { base: "build", past: "built", pp: "built", ing: "building", inf: "to build" },
+      { base: "buy", past: "bought", pp: "bought", ing: "buying", inf: "to buy" },
+      { base: "call", past: "called", pp: "called", ing: "calling", inf: "to call" },
+      { base: "carry", past: "carried", pp: "carried", ing: "carrying", inf: "to carry" },
+      { base: "change", past: "changed", pp: "changed", ing: "changing", inf: "to change" },
+      { base: "clean", past: "cleaned", pp: "cleaned", ing: "cleaning", inf: "to clean" },
+      { base: "climb", past: "climbed", pp: "climbed", ing: "climbing", inf: "to climb" },
+      { base: "close", past: "closed", pp: "closed", ing: "closing", inf: "to close" },
+      { base: "come", past: "came", pp: "come", ing: "coming", inf: "to come" },
+      { base: "cook", past: "cooked", pp: "cooked", ing: "cooking", inf: "to cook" },
+      { base: "count", past: "counted", pp: "counted", ing: "counting", inf: "to count" },
+      { base: "cry", past: "cried", pp: "cried", ing: "crying", inf: "to cry" },
+      { base: "dance", past: "danced", pp: "danced", ing: "dancing", inf: "to dance" },
+      { base: "decide", past: "decided", pp: "decided", ing: "deciding", inf: "to decide" },
+      { base: "describe", past: "described", pp: "described", ing: "describing", inf: "to describe" },
+      { base: "do", past: "did", pp: "done", ing: "doing", inf: "to do" },
+      { base: "draw", past: "drew", pp: "drawn", ing: "drawing", inf: "to draw" },
+      { base: "drink", past: "drank", pp: "drunk", ing: "drinking", inf: "to drink" },
+      { base: "drive", past: "drove", pp: "driven", ing: "driving", inf: "to drive" },
+      { base: "eat", past: "ate", pp: "eaten", ing: "eating", inf: "to eat" },
+      { base: "enjoy", past: "enjoyed", pp: "enjoyed", ing: "enjoying", inf: "to enjoy" },
+      { base: "explain", past: "explained", pp: "explained", ing: "explaining", inf: "to explain" },
+      { base: "fall", past: "fell", pp: "fallen", ing: "falling", inf: "to fall" },
+      { base: "feel", past: "felt", pp: "felt", ing: "feeling", inf: "to feel" },
+      { base: "fight", past: "fought", pp: "fought", ing: "fighting", inf: "to fight" },
+      { base: "find", past: "found", pp: "found", ing: "finding", inf: "to find" },
+      { base: "finish", past: "finished", pp: "finished", ing: "finishing", inf: "to finish" },
+      { base: "fly", past: "flew", pp: "flown", ing: "flying", inf: "to fly" },
+      { base: "forget", past: "forgot", pp: "forgotten", ing: "forgetting", inf: "to forget" },
+      { base: "get", past: "got", pp: "got", ing: "getting", inf: "to get" },
+      { base: "give", past: "gave", pp: "given", ing: "giving", inf: "to give" },
+      { base: "go", past: "went", pp: "gone", ing: "going", inf: "to go" },
+      { base: "grow", past: "grew", pp: "grown", ing: "growing", inf: "to grow" },
+      { base: "guess", past: "guessed", pp: "guessed", ing: "guessing", inf: "to guess" },
+      { base: "happen", past: "happened", pp: "happened", ing: "happening", inf: "to happen" },
+      { base: "hate", past: "hated", pp: "hated", ing: "hating", inf: "to hate" },
+      { base: "have", past: "had", pp: "had", ing: "having", inf: "to have" },
+      { base: "hear", past: "heard", pp: "heard", ing: "hearing", inf: "to hear" },
+      { base: "help", past: "helped", pp: "helped", ing: "helping", inf: "to help" },
+      { base: "hold", past: "held", pp: "held", ing: "holding", inf: "to hold" },
+      { base: "hope", past: "hoped", pp: "hoped", ing: "hoping", inf: "to hope" },
+      { base: "invite", past: "invited", pp: "invited", ing: "inviting", inf: "to invite" },
+      { base: "keep", past: "kept", pp: "kept", ing: "keeping", inf: "to keep" },
+      { base: "know", past: "knew", pp: "known", ing: "knowing", inf: "to know" },
+      { base: "laugh", past: "laughed", pp: "laughed", ing: "laughing", inf: "to laugh" },
+      { base: "learn", past: "learned", pp: "learned", ing: "learning", inf: "to learn" },
+      { base: "leave", past: "left", pp: "left", ing: "leaving", inf: "to leave" },
+      { base: "lend", past: "lent", pp: "lent", ing: "lending", inf: "to lend" },
+      { base: "listen", past: "listened", pp: "listened", ing: "listening", inf: "to listen" },
+      { base: "live", past: "lived", pp: "lived", ing: "living", inf: "to live" },
+      { base: "look", past: "looked", pp: "looked", ing: "looking", inf: "to look" },
+      { base: "lose", past: "lost", pp: "lost", ing: "losing", inf: "to lose" },
+      { base: "love", past: "loved", pp: "loved", ing: "loving", inf: "to love" },
+      { base: "make", past: "made", pp: "made", ing: "making", inf: "to make" },
+      { base: "meet", past: "met", pp: "met", ing: "meeting", inf: "to meet" },
+      { base: "move", past: "moved", pp: "moved", ing: "moving", inf: "to move" },
+      { base: "need", past: "needed", pp: "needed", ing: "needing", inf: "to need" },
+      { base: "open", past: "opened", pp: "opened", ing: "opening", inf: "to open" },
+      { base: "paint", past: "painted", pp: "painted", ing: "painting", inf: "to paint" },
+      { base: "pay", past: "paid", pp: "paid", ing: "paying", inf: "to pay" },
+      { base: "play", past: "played", pp: "played", ing: "playing", inf: "to play" },
+      { base: "prepare", past: "prepared", pp: "prepared", ing: "preparing", inf: "to prepare" },
+      { base: "put", past: "put", pp: "put", ing: "putting", inf: "to put" },
+      { base: "read", past: "read", pp: "read", ing: "reading", inf: "to read" },
+      { base: "remember", past: "remembered", pp: "remembered", ing: "remembering", inf: "to remember" },
+      { base: "ride", past: "rode", pp: "ridden", ing: "riding", inf: "to ride" },
+      { base: "run", past: "ran", pp: "run", ing: "running", inf: "to run" },
+      { base: "say", past: "said", pp: "said", ing: "saying", inf: "to say" },
+      { base: "see", past: "saw", pp: "seen", ing: "seeing", inf: "to see" },
+      { base: "sell", past: "sold", pp: "sold", ing: "selling", inf: "to sell" },
+      { base: "send", past: "sent", pp: "sent", ing: "sending", inf: "to send" },
+      { base: "show", past: "showed", pp: "shown", ing: "showing", inf: "to show" },
+      { base: "sing", past: "sang", pp: "sung", ing: "singing", inf: "to sing" },
+      { base: "sit", past: "sat", pp: "sat", ing: "sitting", inf: "to sit" },
+      { base: "sleep", past: "slept", pp: "slept", ing: "sleeping", inf: "to sleep" },
+      { base: "speak", past: "spoke", pp: "spoken", ing: "speaking", inf: "to speak" },
+      { base: "spend", past: "spent", pp: "spent", ing: "spending", inf: "to spend" },
+      { base: "stand", past: "stood", pp: "stood", ing: "standing", inf: "to stand" },
+      { base: "start", past: "started", pp: "started", ing: "starting", inf: "to start" },
+      { base: "study", past: "studied", pp: "studied", ing: "studying", inf: "to study" },
+      { base: "swim", past: "swam", pp: "swum", ing: "swimming", inf: "to swim" },
+      { base: "take", past: "took", pp: "taken", ing: "taking", inf: "to take" },
+      { base: "talk", past: "talked", pp: "talked", ing: "talking", inf: "to talk" },
+      { base: "teach", past: "taught", pp: "taught", ing: "teaching", inf: "to teach" },
+      { base: "tell", past: "told", pp: "told", ing: "telling", inf: "to tell" },
+      { base: "think", past: "thought", pp: "thought", ing: "thinking", inf: "to think" },
+      { base: "travel", past: "travelled", pp: "travelled", ing: "travelling", inf: "to travel" },
+      { base: "try", past: "tried", pp: "tried", ing: "trying", inf: "to try" },
+      { base: "turn", past: "turned", pp: "turned", ing: "turning", inf: "to turn" },
+      { base: "use", past: "used", pp: "used", ing: "using", inf: "to use" },
+      { base: "wait", past: "waited", pp: "waited", ing: "waiting", inf: "to wait" },
+      { base: "walk", past: "walked", pp: "walked", ing: "walking", inf: "to walk" },
+      { base: "watch", past: "watched", pp: "watched", ing: "watching", inf: "to watch" },
+      { base: "work", past: "worked", pp: "worked", ing: "working", inf: "to work" }
+    ];
+
+    // =====================
+    // Subjekte
+    // =====================
     const subjects = [
       { label: "I",            bePres: "am",  bePast: "was",  havePres: "have", is3sg: false },
       { label: "you",          bePres: "are", bePast: "were", havePres: "have", is3sg: false },
@@ -105,39 +206,6 @@
       { label: "the children", bePres: "are", bePast: "were", havePres: "have", is3sg: false }
     ];
 
-    // Hinweis für dich als Lehrer:
-    // Wenn du neue regelmäßige Verben ergänzt (z.B. stop, plan),
-    // trag bitte die korrekten Formen (Past, -ing, 3. Form) direkt hier ein.
-    // So bleiben auch Spezialfälle (stopped, travelling) orthografisch sauber,
-    // ohne dass komplizierte Rechtschreiblogik im Code nötig ist.
-    const verbsRegular = [
-      { infLabel: "to play",   base: "play",   past: "played",   pp: "played",   ing: "playing"   },
-      { infLabel: "to watch",  base: "watch",  past: "watched",  pp: "watched",  ing: "watching"  },
-      { infLabel: "to open",   base: "open",   past: "opened",   pp: "opened",   ing: "opening"   },
-      { infLabel: "to clean",  base: "clean",  past: "cleaned",  pp: "cleaned",  ing: "cleaning"  },
-      { infLabel: "to visit",  base: "visit",  past: "visited",  pp: "visited",  ing: "visiting"  },
-      { infLabel: "to walk",   base: "walk",   past: "walked",   pp: "walked",   ing: "walking"   },
-      { infLabel: "to talk",   base: "talk",   past: "talked",   pp: "talked",   ing: "talking"   },
-      { infLabel: "to help",   base: "help",   past: "helped",   pp: "helped",   ing: "helping"   },
-      { infLabel: "to study",  base: "study",  past: "studied",  pp: "studied",  ing: "studying"  },
-      { infLabel: "to start",  base: "start",  past: "started",  pp: "started",  ing: "starting"  }
-    ];
-
-    const verbsIrregular = [
-      { infLabel: "to go",    base: "go",    past: "went",  pp: "gone",    ing: "going"   },
-      { infLabel: "to have",  base: "have",  past: "had",   pp: "had",     ing: "having"  },
-      { infLabel: "to do",    base: "do",    past: "did",   pp: "done",    ing: "doing"   },
-      { infLabel: "to eat",   base: "eat",   past: "ate",   pp: "eaten",   ing: "eating"  },
-      { infLabel: "to see",   base: "see",   past: "saw",   pp: "seen",    ing: "seeing"  },
-      { infLabel: "to make",  base: "make",  past: "made",  pp: "made",    ing: "making"  },
-      { infLabel: "to take",  base: "take",  past: "took",  pp: "taken",   ing: "taking"  },
-      { infLabel: "to come",  base: "come",  past: "came",  pp: "come",    ing: "coming"  },
-      { infLabel: "to buy",   base: "buy",   past: "bought",pp: "bought",  ing: "buying"  },
-      { infLabel: "to write", base: "write", past: "wrote", pp: "written", ing: "writing" }
-    ];
-
-    const verbsAll = verbsRegular.concat(verbsIrregular);
-
     function present3sg(verb) {
       if (verb === "have") return "has";
       if (verb === "do")   return "does";
@@ -151,437 +219,317 @@
       return verb + "s";
     }
 
-    // =================================
-    // Generatoren für Tenses (100 items)
-    // =================================
+    function getRandomQuestions(allQuestions, count = 5) {
+      const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+
+    // =====================
+    // TENSE-GENERATOREN (100 Aufgaben / Zeit)
+    // =====================
+
     function generateSimplePresentPractice() {
+      const timePhrases = ["every day.", "every morning.", "after school.", "on Mondays.", "at the weekend.", "in the evening."];
+      const questionsTime = ["every day?", "every morning?", "after school?", "on Mondays?", "at the weekend?", "in the evening?"];
       const items = [];
-      const endings = ["after school.", "every day.", "on Mondays.", "in the morning.", "in the evening.", "at the weekend."];
-      let i = 0;
-
-      while (items.length < 34) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbsAll[i % verbsAll.length];
-        const ending = endings[i % endings.length];
-        const base   = verb.base;
-        const ans    = subj.is3sg ? present3sg(base) : base;
-        const hint   = subj.is3sg ? "He/She/It -> +s" : "Grundform";
-        const q      = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
-        items.push({ type: "pos", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      while (items.length < 34 + 33) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbsAll[(i + 2) % verbsAll.length];
-        const ending = endings[(i + 3) % endings.length];
-        const base   = verb.base;
-        const aux    = subj.is3sg ? "doesn't" : "don't";
-        const hint   = subj.is3sg ? "He/She/It -> doesn't + Grundform" : "don't + Grundform";
-        const q      = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
-        const ans    = `${aux} ${base}`;
-        items.push({ type: "neg", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      const qEndings = ["after school?", "every day?", "on Mondays?", "in the morning?", "in the evening?", "at the weekend?"];
-      while (items.length < 100) {
+      for (let i = 0; i < 100; i++) {
+        const verb = verbs[i];
         const subj = subjects[i % subjects.length];
-        const verb = verbsAll[(i + 4) % verbsAll.length];
-        const base = verb.base;
-        const aux  = subj.is3sg ? "Does" : "Do";
-        const hint = `${aux} + Person + Grundform`;
-        const q    = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
-        const ans  = `${aux} ${subj.label} ${base}`;
-        items.push({ type: "ques", q, a: ans, hint });
-        i++;
+        if (i < 34) {
+          const time = timePhrases[i % timePhrases.length];
+          const base = verb.base;
+          const ans = subj.is3sg ? present3sg(base) : base;
+          const hint = subj.is3sg ? "He/She/It: +s / -es / -ies" : "Grundform";
+          const q = `${subj.label} _____ (${verb.inf}) ${time}`;
+          items.push({ type: "pos", q, a: ans, hint });
+        } else if (i < 67) {
+          const time = timePhrases[i % timePhrases.length];
+          const base = verb.base;
+          const aux = subj.is3sg ? "doesn't" : "don't";
+          const hint = subj.is3sg ? "He/She/It: doesn't + Grundform" : "don't + Grundform";
+          const q = `${subj.label} _____ (not / ${verb.inf}) ${time}`;
+          const a = `${aux} ${base}`;
+          items.push({ type: "neg", q, a, hint });
+        } else {
+          const time = questionsTime[i % questionsTime.length];
+          const base = verb.base;
+          const aux = subj.is3sg ? "Does" : "Do";
+          const hint = `${aux} + Person + Grundform`;
+          const q = `_____ (${verb.inf} / ${subj.label}) ${time}`;
+          const a = `${aux} ${subj.label} ${base}`;
+          items.push({ type: "ques", q, a, hint });
+        }
       }
       return items;
     }
 
     function generateSimplePastPractice() {
+      const timePhrases = ["yesterday.", "last week.", "last year.", "two days ago.", "in 2020.", "an hour ago."];
+      const questionTime = ["yesterday?", "last week?", "last night?", "two days ago?", "on Monday?", "in 2020?"];
       const items = [];
-      const endings = ["yesterday.", "last week.", "last year.", "two days ago.", "in 2019.", "an hour ago."];
-      let i = 0;
-
-      while (items.length < 34) {
-        const subj = subjects[i % subjects.length];
-        const verb = verbsAll[i % verbsAll.length];
-        const ending = endings[i % endings.length];
-        const q = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
-        const ans = verb.past;
-        const hint = `${verb.base} -> ${verb.past}`;
-        items.push({ type: "pos", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      while (items.length < 34 + 33) {
-        const subj = subjects[i % subjects.length];
-        const verb = verbsAll[(i + 3) % verbsAll.length];
-        const ending = endings[(i + 2) % endings.length].replace(".", "");
-        const q = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}.`;
-        const ans = `didn't ${verb.base}`;
-        const hint = "didn't + Grundform";
-        items.push({ type: "neg", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      const qEndings = ["yesterday?", "last week?", "last night?", "two days ago?", "on Monday?", "in 2019?"];
-      while (items.length < 100) {
-        const subj = subjects[i % subjects.length];
-        const verb = verbsAll[(i + 5) % verbsAll.length];
-        const q = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
-        const ans = `Did ${subj.label} ${verb.base}`;
-        const hint = "Did + Person + Grundform";
-        items.push({ type: "ques", q, a: ans, hint });
-        i++;
+      for (let i = 0; i < 100; i++) {
+        const verb = verbs[i];
+        const subj = subjects[(i * 2) % subjects.length];
+        if (i < 34) {
+          const time = timePhrases[i % timePhrases.length];
+          const q = `${subj.label} _____ (${verb.inf}) ${time}`;
+          const a = verb.past;
+          const hint = `${verb.base} → ${verb.past}`;
+          items.push({ type: "pos", q, a, hint });
+        } else if (i < 67) {
+          const time = timePhrases[i % timePhrases.length];
+          const q = `${subj.label} _____ (not / ${verb.inf}) ${time}`;
+          const a = `didn't ${verb.base}`;
+          const hint = "didn't + Grundform";
+          items.push({ type: "neg", q, a, hint });
+        } else {
+          const time = questionTime[i % questionTime.length];
+          const q = `_____ (${verb.inf} / ${subj.label}) ${time}`;
+          const a = `Did ${subj.label} ${verb.base}`;
+          const hint = "Did + Person + Grundform";
+          items.push({ type: "ques", q, a, hint });
+        }
       }
       return items;
     }
 
     function generatePresentProgressivePractice() {
+      const timePhrases = ["now.", "at the moment.", "right now.", "today.", "this morning.", "this evening."];
+      const questionTime = ["now?", "at the moment?", "right now?", "today?", "this morning?", "this evening?"];
       const items = [];
-      const verbs = verbsRegular.slice(0, 6);
-      const endings = ["now.", "at the moment.", "right now.", "today.", "this morning.", "this evening."];
-      let i = 0;
-
-      while (items.length < 34) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbs[i % verbs.length];
-        const ending = endings[i % endings.length];
-        const be     = subj.bePres;
-        const q      = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
-        const ans    = `${be} ${verb.ing}`;
-        let hint;
-        if (be === "am")      hint = "am + Verb-ing";
-        else if (be === "is") hint = "is + Verb-ing";
-        else                  hint = "are + Verb-ing";
-        items.push({ type: "pos", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      while (items.length < 34 + 33) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbs[(i + 2) % verbs.length];
-        const ending = endings[(i + 1) % endings.length];
-        let aux, hint;
-        if (subj.bePres === "am") { aux = "am not"; hint = "am not + Verb-ing"; }
-        else if (subj.bePres === "is") { aux = "isn't"; hint = "isn't + Verb-ing"; }
-        else { aux = "aren't"; hint = "aren't + Verb-ing"; }
-        const q   = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
-        const ans = `${aux} ${verb.ing}`;
-        items.push({ type: "neg", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      const qEndings = ["now?", "at the moment?", "right now?", "today?", "this morning?", "this evening?"];
-      while (items.length < 100) {
-        const subj = subjects[i % subjects.length];
-        const verb = verbs[(i + 4) % verbs.length];
-        let aux;
-        if (subj.bePres === "am")      aux = "Am";
-        else if (subj.bePres === "is") aux = "Is";
-        else                           aux = "Are";
-        const q    = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
-        const ans  = `${aux} ${subj.label} ${verb.ing}`;
-        const hint = `${aux} + Person + Verb-ing`;
-        items.push({ type: "ques", q, a: ans, hint });
-        i++;
+      for (let i = 0; i < 100; i++) {
+        const verb = verbs[i];
+        const subj = subjects[(i * 3) % subjects.length];
+        const be = subj.bePres;
+        if (i < 34) {
+          const time = timePhrases[i % timePhrases.length];
+          const q = `${subj.label} _____ (${verb.inf}) ${time}`;
+          const a = `${be} ${verb.ing}`;
+          const hint = `${be} + Verb-ing`;
+          items.push({ type: "pos", q, a, hint });
+        } else if (i < 67) {
+          const time = timePhrases[i % timePhrases.length];
+          let aux, hint;
+          if (be === "am") { aux = "am not"; hint = "am not + Verb-ing"; }
+          else if (be === "is") { aux = "isn't"; hint = "isn't + Verb-ing"; }
+          else { aux = "aren't"; hint = "aren't + Verb-ing"; }
+          const q = `${subj.label} _____ (not / ${verb.inf}) ${time}`;
+          const a = `${aux} ${verb.ing}`;
+          items.push({ type: "neg", q, a, hint });
+        } else {
+          const time = questionTime[i % questionTime.length];
+          let aux;
+          if (be === "am") aux = "Am";
+          else if (be === "is") aux = "Is";
+          else aux = "Are";
+          const q = `_____ (${verb.inf} / ${subj.label}) ${time}`;
+          const a = `${aux} ${subj.label} ${verb.ing}`;
+          const hint = `${aux} + Person + Verb-ing`;
+          items.push({ type: "ques", q, a, hint });
+        }
       }
       return items;
     }
 
     function generatePastProgressivePractice() {
+      const timePhrases = ["yesterday at 5.", "when he called.", "while it rained.", "all evening.", "all day.", "at that moment."];
+      const questionTime = ["yesterday at 5?", "when he called?", "while it rained?", "all evening?", "all day?", "at that moment?"];
       const items = [];
-      const verbs = verbsRegular.slice(0, 6);
-      const endings = ["yesterday at 5.", "when he called.", "while it rained.", "all evening.", "all day.", "at that moment."];
-      let i = 0;
-
-      while (items.length < 34) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbs[i % verbs.length];
-        const ending = endings[i % endings.length];
-        const be     = subj.bePast;
-        const q      = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
-        const ans    = `${be} ${verb.ing}`;
-        const hint   = `${be} + Verb-ing`;
-        items.push({ type: "pos", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      while (items.length < 34 + 33) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbs[(i + 2) % verbs.length];
-        const ending = endings[(i + 1) % endings.length];
-        const aux    = subj.bePast === "was" ? "wasn't" : "weren't";
-        const q      = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
-        const ans    = `${aux} ${verb.ing}`;
-        const hint   = `${aux} + Verb-ing`;
-        items.push({ type: "neg", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      const qEndings = ["yesterday at 5?", "when he called?", "while it rained?", "all evening?", "all day?", "at that moment?"];
-      while (items.length < 100) {
-        const subj = subjects[i % subjects.length];
-        const verb = verbs[(i + 4) % verbs.length];
-        const aux  = subj.bePast === "was" ? "Was" : "Were";
-        const q    = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
-        const ans  = `${aux} ${subj.label} ${verb.ing}`;
-        const hint = `${aux} + Person + Verb-ing`;
-        items.push({ type: "ques", q, a: ans, hint });
-        i++;
+      for (let i = 0; i < 100; i++) {
+        const verb = verbs[i];
+        const subj = subjects[(i * 4) % subjects.length];
+        const bePast = subj.bePast;
+        if (i < 34) {
+          const time = timePhrases[i % timePhrases.length];
+          const q = `${subj.label} _____ (${verb.inf}) ${time}`;
+          const a = `${bePast} ${verb.ing}`;
+          const hint = `${bePast} + Verb-ing`;
+          items.push({ type: "pos", q, a, hint });
+        } else if (i < 67) {
+          const time = timePhrases[i % timePhrases.length];
+          const aux = bePast === "was" ? "wasn't" : "weren't";
+          const q = `${subj.label} _____ (not / ${verb.inf}) ${time}`;
+          const a = `${aux} ${verb.ing}`;
+          const hint = `${aux} + Verb-ing`;
+          items.push({ type: "neg", q, a, hint });
+        } else {
+          const time = questionTime[i % questionTime.length];
+          const aux = bePast === "was" ? "Was" : "Were";
+          const q = `_____ (${verb.inf} / ${subj.label}) ${time}`;
+          const a = `${aux} ${subj.label} ${verb.ing}`;
+          const hint = `${aux} + Person + Verb-ing`;
+          items.push({ type: "ques", q, a, hint });
+        }
       }
       return items;
     }
 
     function generateWillFuturePractice() {
+      const timePhrases = ["tomorrow.", "next week.", "next month.", "soon.", "later.", "this evening."];
+      const questionTime = ["tomorrow?", "next week?", "next month?", "soon?", "later?", "this evening?"];
       const items = [];
-      const endings = ["tomorrow.", "next week.", "next month.", "soon.", "later.", "this evening."];
-      let i = 0;
-
-      while (items.length < 34) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbsAll[i % verbsAll.length];
-        const ending = endings[i % endings.length];
-        const q      = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
-        const ans    = `will ${verb.base}`;
-        const hint   = "will + Grundform";
-        items.push({ type: "pos", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      while (items.length < 34 + 33) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbsAll[(i + 3) % verbsAll.length];
-        const ending = endings[(i + 1) % endings.length];
-        const q      = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
-        const ans    = `won't ${verb.base}`;
-        const hint   = "won't + Grundform";
-        items.push({ type: "neg", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      const qEndings = ["tomorrow?", "next week?", "next month?", "soon?", "later?", "this evening?"];
-      while (items.length < 100) {
-        const subj = subjects[i % subjects.length];
-        const verb = verbsAll[(i + 5) % verbsAll.length];
-        const q    = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
-        const ans  = `Will ${subj.label} ${verb.base}`;
-        const hint = "Will + Person + Grundform";
-        items.push({ type: "ques", q, a: ans, hint });
-        i++;
+      for (let i = 0; i < 100; i++) {
+        const verb = verbs[i];
+        const subj = subjects[(i * 5) % subjects.length];
+        if (i < 34) {
+          const time = timePhrases[i % timePhrases.length];
+          const q = `${subj.label} _____ (${verb.inf}) ${time}`;
+          const a = `will ${verb.base}`;
+          const hint = "will + Grundform";
+          items.push({ type: "pos", q, a, hint });
+        } else if (i < 67) {
+          const time = timePhrases[i % timePhrases.length];
+          const q = `${subj.label} _____ (not / ${verb.inf}) ${time}`;
+          const a = `won't ${verb.base}`;
+          const hint = "won't + Grundform";
+          items.push({ type: "neg", q, a, hint });
+        } else {
+          const time = questionTime[i % questionTime.length];
+          const q = `_____ (${verb.inf} / ${subj.label}) ${time}`;
+          const a = `Will ${subj.label} ${verb.base}`;
+          const hint = "Will + Person + Grundform";
+          items.push({ type: "ques", q, a, hint });
+        }
       }
       return items;
     }
 
     function generateGoingToFuturePractice() {
+      const timePhrases = ["tomorrow.", "next week.", "next month.", "soon.", "later.", "this afternoon."];
+      const questionTime = ["tomorrow?", "next week?", "next month?", "soon?", "later?", "this afternoon?"];
       const items = [];
-      const endings = ["tomorrow.", "next week.", "next month.", "soon.", "later.", "this afternoon."];
-      let i = 0;
-
-      while (items.length < 34) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbsAll[i % verbsAll.length];
-        const ending = endings[i % endings.length];
-        const be     = subj.bePres;
-        const q      = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
-        const ans    = `${be} going to ${verb.base}`;
-        const hint   = "am/is/are going to + Grundform";
-        items.push({ type: "pos", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      while (items.length < 34 + 33) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbsAll[(i + 3) % verbsAll.length];
-        const ending = endings[(i + 1) % endings.length];
-        let aux;
-        if (subj.bePres === "am")      aux = "am not going to";
-        else if (subj.bePres === "is") aux = "isn't going to";
-        else                           aux = "aren't going to";
-        const q   = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
-        const ans = `${aux} ${verb.base}`;
-        const hint = "am/is/are not going to + Grundform";
-        items.push({ type: "neg", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      const qEndings = ["tomorrow?", "next week?", "next month?", "soon?", "later?", "this afternoon?"];
-      while (items.length < 100) {
-        const subj = subjects[i % subjects.length];
-        const verb = verbsAll[(i + 5) % verbsAll.length];
-        let aux;
-        if (subj.bePres === "am")      aux = "Am";
-        else if (subj.bePres === "is") aux = "Is";
-        else                           aux = "Are";
-        const q    = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
-        const ans  = `${aux} ${subj.label} going to ${verb.base}`;
-        const hint = "Am/Is/Are + Person + going to + Grundform";
-        items.push({ type: "ques", q, a: ans, hint });
-        i++;
+      for (let i = 0; i < 100; i++) {
+        const verb = verbs[i];
+        const subj = subjects[(i * 6) % subjects.length];
+        const be = subj.bePres;
+        if (i < 34) {
+          const time = timePhrases[i % timePhrases.length];
+          const q = `${subj.label} _____ (${verb.inf}) ${time}`;
+          const a = `${be} going to ${verb.base}`;
+          const hint = "am/is/are going to + Grundform";
+          items.push({ type: "pos", q, a, hint });
+        } else if (i < 67) {
+          const time = timePhrases[i % timePhrases.length];
+          let aux;
+          if (be === "am") aux = "am not going to";
+          else if (be === "is") aux = "isn't going to";
+          else aux = "aren't going to";
+          const q = `${subj.label} _____ (not / ${verb.inf}) ${time}`;
+          const a = `${aux} ${verb.base}`;
+          const hint = "am/is/are not going to + Grundform";
+          items.push({ type: "neg", q, a, hint });
+        } else {
+          const time = questionTime[i % questionTime.length];
+          let aux;
+          if (be === "am") aux = "Am";
+          else if (be === "is") aux = "Is";
+          else aux = "Are";
+          const q = `_____ (${verb.inf} / ${subj.label}) ${time}`;
+          const a = `${aux} ${subj.label} going to ${verb.base}`;
+          const hint = "Am/Is/Are + Person + going to + Grundform";
+          items.push({ type: "ques", q, a, hint });
+        }
       }
       return items;
     }
 
     function generatePresentPerfectPractice() {
+      const endPos = ["already.", "just now.", "today.", "this week.", "many times.", "before."];
+      const endNeg = ["yet.", "today.", "this week.", "so far.", "before.", "this year."];
+      const endQ = ["yet?", "today?", "this week?", "before?", "so far?", "this year?"];
       const items = [];
-      const endingsPos = ["already.", "just now.", "today.", "this week.", "many times.", "before."];
-      const endingsNeg = ["yet.", "today.", "this week.", "so far.", "before.", "this year."];
-      let i = 0;
-
-      while (items.length < 34) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbsAll[i % verbsAll.length];
-        const ending = endingsPos[i % endingsPos.length];
-        const aux    = subj.havePres;
-        const q      = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
-        const ans    = `${aux} ${verb.pp}`;
-        const hint   = `${aux} + 3. Form`;
-        items.push({ type: "pos", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      while (items.length < 34 + 33) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbsAll[(i + 3) % verbsAll.length];
-        const ending = endingsNeg[i % endingsNeg.length];
-        const aux    = subj.havePres === "has" ? "hasn't" : "haven't";
-        const q      = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
-        const ans    = `${aux} ${verb.pp}`;
-        const hint   = `${aux} + 3. Form`;
-        items.push({ type: "neg", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      const qEndings = ["yet?", "today?", "this week?", "before?", "so far?", "this year?"];
-      while (items.length < 100) {
-        const subj = subjects[i % subjects.length];
-        const verb = verbsAll[(i + 5) % verbsAll.length];
-        const aux  = subj.havePres === "has" ? "Has" : "Have";
-        const q    = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
-        const ans  = `${aux} ${subj.label} ${verb.pp}`;
-        const hint = `${aux} + Person + 3. Form`;
-        items.push({ type: "ques", q, a: ans, hint });
-        i++;
+      for (let i = 0; i < 100; i++) {
+        const verb = verbs[i];
+        const subj = subjects[(i * 7) % subjects.length];
+        if (i < 34) {
+          const end = endPos[i % endPos.length];
+          const aux = subj.havePres;
+          const q = `${subj.label} _____ (${verb.inf}) ${end}`;
+          const a = `${aux} ${verb.pp}`;
+          const hint = `${aux} + 3. Form`;
+          items.push({ type: "pos", q, a, hint });
+        } else if (i < 67) {
+          const end = endNeg[i % endNeg.length];
+          const aux = subj.havePres === "has" ? "hasn't" : "haven't";
+          const q = `${subj.label} _____ (not / ${verb.inf}) ${end}`;
+          const a = `${aux} ${verb.pp}`;
+          const hint = `${aux} + 3. Form`;
+          items.push({ type: "neg", q, a, hint });
+        } else {
+          const end = endQ[i % endQ.length];
+          const aux = subj.havePres === "has" ? "Has" : "Have";
+          const q = `_____ (${verb.inf} / ${subj.label}) ${end}`;
+          const a = `${aux} ${subj.label} ${verb.pp}`;
+          const hint = `${aux} + Person + 3. Form`;
+          items.push({ type: "ques", q, a, hint });
+        }
       }
       return items;
     }
 
     function generatePastPerfectPractice() {
+      const endPos = ["before I arrived.", "when the film started.", "before lunch.", "by 6 o'clock.", "before the test.", "when he called."];
+      const endNeg = ["before I arrived.", "before the lesson.", "before lunch.", "by 6 o'clock.", "before the test.", "when he called."];
+      const endQ = ["before I arrived?", "before the film started?", "before lunch?", "by 6 o'clock?", "before the test?", "when he called?"];
       const items = [];
-      const endingsPos = ["before I arrived.", "when the film started.", "before lunch.", "by 6 o'clock.", "before the test.", "when he called."];
-      const endingsNeg = ["before I arrived.", "before the lesson.", "before lunch.", "by 6 o'clock.", "before the test.", "when he called."];
-      let i = 0;
-
-      while (items.length < 34) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbsAll[i % verbsAll.length];
-        const ending = endingsPos[i % endingsPos.length];
-        const q      = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
-        const ans    = `had ${verb.pp}`;
-        const hint   = "had + 3. Form";
-        items.push({ type: "pos", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      while (items.length < 34 + 33) {
-        const subj   = subjects[i % subjects.length];
-        const verb   = verbsAll[(i + 3) % verbsAll.length];
-        const ending = endingsNeg[i % endingsNeg.length];
-        const q      = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
-        const ans    = `hadn't ${verb.pp}`;
-        const hint   = "hadn't + 3. Form";
-        items.push({ type: "neg", q, a: ans, hint });
-        i++;
-      }
-
-      i = 0;
-      const qEndings = ["before I arrived?", "before the film started?", "before lunch?", "by 6 o'clock?", "before the test?", "when he called?"];
-      while (items.length < 100) {
-        const subj = subjects[i % subjects.length];
-        const verb = verbsAll[(i + 5) % verbsAll.length];
-        const q    = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
-        const ans  = `Had ${subj.label} ${verb.pp}`;
-        const hint = "Had + Person + 3. Form";
-        items.push({ type: "ques", q, a: ans, hint });
-        i++;
+      for (let i = 0; i < 100; i++) {
+        const verb = verbs[i];
+        const subj = subjects[(i * 8) % subjects.length];
+        if (i < 34) {
+          const end = endPos[i % endPos.length];
+          const q = `${subj.label} _____ (${verb.inf}) ${end}`;
+          const a = `had ${verb.pp}`;
+          const hint = "had + 3. Form";
+                    const hint = "had + 3. Form";
+          items.push({ type: "pos", q, a, hint });
+        } else if (i < 67) {
+          const end = endNeg[i % endNeg.length];
+          const q = `${subj.label} _____ (not / ${verb.inf}) ${end}`;
+          const a = `hadn't ${verb.pp}`;
+          const hint = "hadn't + 3. Form";
+          items.push({ type: "neg", q, a, hint });
+        } else {
+          const end = endQ[i % endQ.length];
+          const q = `_____ (${verb.inf} / ${subj.label}) ${end}`;
+          const a = `Had ${subj.label} ${verb.pp}`;
+          const hint = "Had + Person + 3. Form";
+          items.push({ type: "ques", q, a, hint });
+        }
       }
       return items;
     }
 
-    // =====================================
-    // Grammatik-Themen (50 Items) – erweitert
-    // =====================================
+    // =====================
+    // GRAMMAR-THEMEN (100 Aufgaben)
+    // =====================
 
     function generateIfClausesPractice() {
       const items = [];
-
-      const type1Templates = [
-        { q: "If it _____ (to rain), we will stay at home.", a: "rains", hint: "If + Simple Present, will + Infinitiv" },
-        { q: "If you _____ (to study), you will pass the test.", a: "study", hint: "If-Teil im Simple Present" },
-        { q: "If she _____ (to call) me, I will be happy.", a: "calls", hint: "he/she/it + s" },
-        { q: "If they _____ (to hurry), they will catch the bus.", a: "hurry", hint: "Grundform im If-Teil" },
-        { q: "If we don't eat, we _____ (to be) hungry.", a: "will be", hint: "Hauptsatz: will + Grundform" },
-        { q: "If you _____ (to drink) too much coke, you will feel bad.", a: "drink", hint: "Simple Present" },
-        { q: "If the sun _____ (to shine), we will go to the beach.", a: "shines", hint: "he/she/it + s" },
-        { q: "If I have time, I _____ (to help) you.", a: "will help", hint: "will + Grundform" },
-        { q: "If you are tired, you _____ (to go) to bed.", a: "can go", hint: "kann auch anderes Modalverb sein" },
-        { q: "If it gets cold, I _____ (to put on) my jacket.", a: "will put on", hint: "will + Grundform" }
-      ];
-
-      const type2Templates = [
-        { q: "If I _____ (to have) more money, I would buy a car.", a: "had", hint: "If + Simple Past, would + Infinitiv" },
-        { q: "If he _____ (to be) taller, he would play basketball.", a: "were", hint: "If I/he/she/it were ..." },
-        { q: "If they _____ (to live) in London, they would speak English every day.", a: "lived", hint: "Simple Past" },
-        { q: "If we _____ (to win) the lottery, we would travel the world.", a: "won", hint: "Irregular: win → won" },
-        { q: "If she _____ (to know) his number, she would call him.", a: "knew", hint: "Simple Past" },
-        { q: "If I were you, I _____ (to talk) to the teacher.", a: "would talk", hint: "would + Grundform" },
-        { q: "If it _____ (to rain), we would stay at home.", a: "rained", hint: "Unwahrscheinliche Bedingung" },
-        { q: "If they had a car, they _____ (to drive) to school.", a: "would drive", hint: "would + Grundform" },
-        { q: "If Tom _____ (to be) older, he would go to that party.", a: "were", hint: "If Tom were ..." },
-        { q: "If we _____ (to have) more time, we would visit you.", a: "had", hint: "Simple Past" }
-      ];
-
-      const type3Templates = [
-        { q: "If she _____ (to study) harder, she would have passed the exam.", a: "had studied", hint: "If + Past Perfect" },
-        { q: "If we had left earlier, we _____ (to catch) the train.", a: "would have caught", hint: "would have + 3. Form" },
-        { q: "If I _____ (to know) that, I would have helped you.", a: "had known", hint: "Past Perfect" },
-        { q: "If they _____ (to listen) to the teacher, they wouldn't have made this mistake.", a: "had listened", hint: "If + Past Perfect" },
-        { q: "If he had called me, I _____ (to go) to the party.", a: "would have gone", hint: "would have + 3. Form" },
-        { q: "If it _____ (to rain), the match would have been cancelled.", a: "had rained", hint: "If-Teil: Past Perfect" },
-        { q: "If we had taken a taxi, we _____ (to arrive) on time.", a: "would have arrived", hint: "would have + 3. Form" },
-        { q: "If you _____ (to tell) me earlier, I could have helped you.", a: "had told", hint: "If + Past Perfect" },
-        { q: "If they had prepared better, they _____ (not / to fail) the exam.", a: "wouldn't have failed", hint: "wouldn't have + 3. Form" },
-        { q: "If I _____ (to see) her, I would have said hello.", a: "had seen", hint: "Past Perfect" }
-      ];
-
+      const type1Times = ["tomorrow", "next week", "this afternoon", "on Saturday", "next year"];
+      const type2Phrases = ["more money", "a bigger house", "a car", "more free time", "a dog"];
+      const type3Times = ["yesterday", "last week", "last year", "two days ago", "in 2020"];
       let i = 0;
-      while (items.length < 50) {
+      while (items.length < 100) {
+        const verb = verbs[i % verbs.length];
+        const subj = subjects[i % subjects.length];
         if (items.length % 3 === 0) {
-          const t = type1Templates[i % type1Templates.length];
-          items.push({ type: "type1", q: t.q, a: t.a, hint: t.hint });
+          const time = type1Times[i % type1Times.length];
+          const q = `If ${subj.label} _____ (${verb.inf}) ${time}, ${subj.label} will ${verb.base}.`;
+          const a = subj.is3sg ? present3sg(verb.base) : verb.base;
+          const hint = "Type 1: If + Simple Present, will + Grundform";
+          items.push({ type: "type1", q, a, hint });
         } else if (items.length % 3 === 1) {
-          const t = type2Templates[i % type2Templates.length];
-          items.push({ type: "type2", q: t.q, a: t.a, hint: t.hint });
+          const wish = type2Phrases[i % type2Phrases.length];
+          const q = `If ${subj.label} _____ (${verb.inf}), ${subj.label} would ${verb.base} ${wish}.`;
+          const a = verb.past;
+          const hint = "Type 2: If + Simple Past, would + Grundform";
+          items.push({ type: "type2", q, a, hint });
         } else {
-          const t = type3Templates[i % type3Templates.length];
-          items.push({ type: "type3", q: t.q, a: t.a, hint: t.hint });
+          const time = type3Times[i % type3Times.length];
+          const q = `If ${subj.label} _____ (${verb.inf}) ${time}, ${subj.label} would have ${verb.pp}.`;
+          const a = `had ${verb.pp}`;
+          const hint = "Type 3: If + Past Perfect, would have + 3. Form";
+          items.push({ type: "type3", q, a, hint });
         }
         i++;
       }
@@ -591,69 +539,58 @@
     function generateComparativesPractice() {
       const items = [];
       const adjectives = [
-        { base: "tall",        comp: "taller",             sup: "the tallest" },
-        { base: "small",       comp: "smaller",            sup: "the smallest" },
-        { base: "fast",        comp: "faster",             sup: "the fastest" },
-        { base: "slow",        comp: "slower",             sup: "the slowest" },
-        { base: "old",         comp: "older",              sup: "the oldest" },
-        { base: "young",       comp: "younger",            sup: "the youngest" },
-        { base: "interesting", comp: "more interesting",   sup: "the most interesting" },
-        { base: "boring",      comp: "more boring",        sup: "the most boring" },
-        { base: "good",        comp: "better",             sup: "the best" },
-        { base: "bad",         comp: "worse",              sup: "the worst" },
-        { base: "cheap",       comp: "cheaper",            sup: "the cheapest" },
-        { base: "expensive",   comp: "more expensive",     sup: "the most expensive" },
-        { base: "important",   comp: "more important",     sup: "the most important" },
-        { base: "short",       comp: "shorter",            sup: "the shortest" },
-        { base: "strong",      comp: "stronger",           sup: "the strongest" }
+        { base: "tall",        comp: "taller",           sup: "the tallest" },
+        { base: "small",       comp: "smaller",          sup: "the smallest" },
+        { base: "fast",        comp: "faster",           sup: "the fastest" },
+        { base: "slow",        comp: "slower",           sup: "the slowest" },
+        { base: "old",         comp: "older",            sup: "the oldest" },
+        { base: "young",       comp: "younger",          sup: "the youngest" },
+        { base: "interesting", comp: "more interesting", sup: "the most interesting" },
+        { base: "boring",      comp: "more boring",      sup: "the most boring" },
+        { base: "good",        comp: "better",           sup: "the best" },
+        { base: "bad",         comp: "worse",            sup: "the worst" },
+        { base: "cheap",       comp: "cheaper",          sup: "the cheapest" },
+        { base: "expensive",   comp: "more expensive",   sup: "the most expensive" }
       ];
-      let i = 0;
-      while (items.length < 25) {
+      for (let i = 0; i < 100; i++) {
         const adj = adjectives[i % adjectives.length];
-        items.push({
-          type: "mix",
-          q: "Tom is _____ (" + adj.base + ") than Jim.",
-          a: adj.comp,
-          hint: "Komparativ: -er oder more + Adjektiv"
-        });
-        i++;
-      }
-      i = 0;
-      while (items.length < 50) {
-        const adj = adjectives[i % adjectives.length];
-        items.push({
-          type: "mix",
-          q: "This is _____ (" + adj.base + ") book in the class.",
-          a: adj.sup,
-          hint: "Superlativ: the + -est / the most ..."
-        });
-        i++;
+        if (i < 50) {
+          const q = `Tom is _____ (${adj.base}) than Jim.`;
+          const a = adj.comp;
+          const hint = "Comparative: -er oder more + Adjektiv";
+          items.push({ type: "mix", q, a, hint });
+        } else {
+          const q = `This is _____ (${adj.base}) book in the class.`;
+          const a = adj.sup;
+          const hint = "Superlative: the + -est / the most ...";
+          items.push({ type: "mix", q, a, hint });
+        }
       }
       return items;
     }
 
     function generateQuestionFormationPractice() {
-      const items = [];
-      const templates = [
-        { q: "_____ (you / to like) pizza?", a: "Do you like", hint: "Do + you + Grundform" },
-        { q: "_____ (she / to play) tennis?", a: "Does she play", hint: "Does + she + Grundform" },
-        { q: "Where _____ (they / to live)?", a: "do they live", hint: "Fragewort + do/does" },
-        { q: "When _____ (he / to get up)?", a: "does he get up", hint: "When + does + he" },
-        { q: "_____ (you / to go) to school yesterday?", a: "Did you go", hint: "Did + Grundform" },
-        { q: "Why _____ (she / to cry) yesterday?", a: "did she cry", hint: "Why + did + she" },
-        { q: "_____ (they / to be) at home yesterday?", a: "Were they", hint: "to be im Simple Past" },
-        { q: "Where _____ (she / to be) now?", a: "is she", hint: "Fragewort + be" },
-        { q: "What _____ (you / to do) now?", a: "are you doing", hint: "Present Progressive: be + Verb-ing" },
-        { q: "What _____ (she / to do) at the moment?", a: "is she doing", hint: "is + she + Verb-ing" },
-        { q: "How long _____ (you / to live) here?", a: "have you lived", hint: "Present Perfect Frage" },
-        { q: "_____ (he / to have) a dog?", a: "Does he have", hint: "have als Vollverb" },
-        { q: "Who _____ (to help) you with your homework?", a: "helps", hint: "Who + Verb (kein do/does)" },
-        { q: "What time _____ (the film / to start)?", a: "does the film start", hint: "Fragewort + does" },
-        { q: "Why _____ (they / to be) late?", a: "are they", hint: "be vor dem Subjekt" }
+      const baseTemplates = [
+        { q: "_____ (you / to like) pizza?",              a: "Do you like",            hint: "Do + you + Grundform" },
+        { q: "_____ (she / to play) tennis?",             a: "Does she play",          hint: "Does + she + Grundform" },
+        { q: "Where _____ (they / to live)?",             a: "do they live",           hint: "Fragewort + do/does" },
+        { q: "When _____ (he / to get up)?",              a: "does he get up",         hint: "When + does + he" },
+        { q: "_____ (you / to go) to school yesterday?",  a: "Did you go",             hint: "Did + Grundform" },
+        { q: "Why _____ (she / to cry) yesterday?",       a: "did she cry",            hint: "Why + did + she" },
+        { q: "_____ (they / to be) at home yesterday?",   a: "Were they",              hint: "to be im Simple Past" },
+        { q: "Where _____ (she / to be) now?",            a: "is she",                 hint: "Fragewort + be" },
+        { q: "What _____ (you / to do) now?",             a: "are you doing",          hint: "Present Progressive" },
+        { q: "What _____ (she / to do) at the moment?",   a: "is she doing",           hint: "is + she + Verb-ing" },
+        { q: "How long _____ (you / to live) here?",      a: "have you lived",         hint: "Present Perfect" },
+        { q: "_____ (he / to have) a dog?",               a: "Does he have",           hint: "have als Vollverb" },
+        { q: "Who _____ (to help) you with your homework?", a: "helps",               hint: "Who + Verb (kein do/does)" },
+        { q: "What time _____ (the film / to start)?",    a: "does the film start",    hint: "Fragewort + does" },
+        { q: "Why _____ (they / to be) late?",            a: "are they",               hint: "be vor dem Subjekt" }
       ];
+      const items = [];
       let i = 0;
-      while (items.length < 50) {
-        const t = templates[i % templates.length];
+      while (items.length < 100) {
+        const t = baseTemplates[i % baseTemplates.length];
         items.push({ type: "ques", q: t.q, a: t.a, hint: t.hint });
         i++;
       }
@@ -661,24 +598,24 @@
     }
 
     function generateModalVerbsPractice() {
-      const items = [];
-      const templates = [
-        { q: "You _____ (can) swim very well.", a: "can", hint: "Modalverb + Grundform" },
-        { q: "She _____ (must) do her homework.", a: "must", hint: "starke Pflicht" },
-        { q: "We _____ (should) help our parents.", a: "should", hint: "Rat geben" },
-        { q: "They _____ (must not) be late.", a: "must not", hint: "Verbot: mustn't" },
-        { q: "I _____ (may) go to the party.", a: "may", hint: "vielleicht dürfen" },
-        { q: "You _____ (should not) eat so much fast food.", a: "should not", hint: "shouldn't" },
-        { q: "He _____ (can't) play the piano.", a: "can't", hint: "can not" },
-        { q: "We _____ (might) see him tomorrow.", a: "might", hint: "vielleicht (unsicherer als may)" },
-        { q: "You _____ (must) wear a helmet.", a: "must", hint: "Regel oder Gesetz" },
+      const baseTemplates = [
+        { q: "You _____ (can) swim very well.",                      a: "can",       hint: "Modalverb + Grundform" },
+        { q: "She _____ (must) do her homework.",                    a: "must",      hint: "starke Pflicht" },
+        { q: "We _____ (should) help our parents.",                  a: "should",    hint: "Rat geben" },
+        { q: "They _____ (must not) be late.",                       a: "must not",  hint: "Verbot: mustn't" },
+        { q: "I _____ (may) go to the party.",                       a: "may",       hint: "vielleicht dürfen" },
+        { q: "You _____ (should not) eat so much fast food.",        a: "should not",hint: "shouldn't" },
+        { q: "He _____ (can't) play the piano.",                     a: "can't",     hint: "can not" },
+        { q: "We _____ (might) see him tomorrow.",                   a: "might",     hint: "unsichere Möglichkeit" },
+        { q: "You _____ (must) wear a helmet.",                      a: "must",      hint: "Regel oder Gesetz" },
         { q: "Students _____ (must not) use their phones in the exam.", a: "must not", hint: "strenges Verbot" },
-        { q: "You _____ (can) ask your teacher for help.", a: "can", hint: "Erlaubnis / Möglichkeit" },
-        { q: "She _____ (should) drink more water.", a: "should", hint: "Gesundheitstipp" }
+        { q: "You _____ (can) ask your teacher for help.",           a: "can",       hint: "Erlaubnis / Möglichkeit" },
+        { q: "She _____ (should) drink more water.",                 a: "should",    hint: "Gesundheitstipp" }
       ];
+      const items = [];
       let i = 0;
-      while (items.length < 50) {
-        const t = templates[i % templates.length];
+      while (items.length < 100) {
+        const t = baseTemplates[i % baseTemplates.length];
         items.push({ type: "mix", q: t.q, a: t.a, hint: t.hint });
         i++;
       }
@@ -686,22 +623,22 @@
     }
 
     function generateMuchManyPractice() {
-      const items = [];
-      const templates = [
-        { q: "There isn't _____ water in the glass.", a: "much", hint: "uncountable -> much" },
-        { q: "How _____ apples do you want?", a: "many", hint: "zählbar -> many" },
-        { q: "She has too _____ homework.", a: "much", hint: "uncountable -> much" },
-        { q: "There are _____ books on the table.", a: "many", hint: "Plural -> many" },
-        { q: "We don't have _____ time.", a: "much", hint: "time = uncountable" },
-        { q: "I have _____ friends in London.", a: "many", hint: "friends = plural" },
+      const baseTemplates = [
+        { q: "There isn't _____ water in the glass.",   a: "much", hint: "uncountable → much" },
+        { q: "How _____ apples do you want?",           a: "many", hint: "zählbar → many" },
+        { q: "She has too _____ homework.",             a: "much", hint: "homework = uncountable" },
+        { q: "There are _____ books on the table.",     a: "many", hint: "Plural → many" },
+        { q: "We don't have _____ time.",               a: "much", hint: "time = uncountable" },
+        { q: "I have _____ friends in London.",         a: "many", hint: "friends = plural" },
         { q: "How _____ sugar do you put in your tea?", a: "much", hint: "sugar = uncountable" },
-        { q: "How _____ students are in your class?", a: "many", hint: "students = plural" },
+        { q: "How _____ students are in your class?",   a: "many", hint: "students = plural" },
         { q: "There isn't _____ milk left in the fridge.", a: "much", hint: "milk = uncountable" },
-        { q: "He has _____ CDs at home.", a: "many", hint: "CDs = plural" }
+        { q: "He has _____ CDs at home.",               a: "many", hint: "CDs = plural" }
       ];
+      const items = [];
       let i = 0;
-      while (items.length < 50) {
-        const t = templates[i % templates.length];
+      while (items.length < 100) {
+        const t = baseTemplates[i % baseTemplates.length];
         items.push({ type: "mix", q: t.q, a: t.a, hint: t.hint });
         i++;
       }
@@ -709,72 +646,62 @@
     }
 
     function generateWordOrderPractice() {
-      const items = [];
-      const templates = [
+      const baseTemplates = [
         {
-          q: "Ordne die Wörter zu einem richtigen Satz:
-(always / does / her homework / she / in the evening)",
+          q: "Ordne die Wörter zu einem richtigen Satz:\n(always / does / her homework / she / in the evening)",
           a: "She always does her homework in the evening.",
-          hint: "Reihenfolge: Subjekt – Adverb – Verb – Rest."
+          hint: "Subjekt – Adverb – Verb – Rest."
         },
         {
-          q: "Ordne die Wörter:
-(often / we / play / football / after school)",
+          q: "Ordne die Wörter:\n(often / we / play / football / after school)",
           a: "We often play football after school.",
-          hint: "Adverb der Häufigkeit vor dem Vollverb."
+          hint: "Adverb vor dem Vollverb."
         },
         {
-          q: "Ordne die Wörter:
-(never / is / he / late / for school)",
+          q: "Ordne die Wörter:\n(never / is / he / late / for school)",
           a: "He is never late for school.",
-          hint: "Adverb nach Formen von be (am/is/are)."
+          hint: "Adverb nach be."
         },
         {
-          q: "Ordne die Wörter:
-(in the morning / I / usually / get up / at 7 o'clock)",
+          q: "Ordne die Wörter:\n(in the morning / I / usually / get up / at 7 o'clock)",
           a: "I usually get up at 7 o'clock in the morning.",
-          hint: "Zeitangaben meist am Ende oder Anfang."
+          hint: "Zeitangaben meistens am Ende."
         },
         {
-          q: "Ordne die Wörter:
-(English / on Mondays / we / have / always)",
+          q: "Ordne die Wörter:\n(English / on Mondays / we / have / always)",
           a: "We always have English on Mondays.",
           hint: "Subjekt – Adverb – Verb – Objekt – Zeit."
         },
         {
-          q: "Ordne die Wörter:
-(sometimes / in the park / they / play / football)",
+          q: "Ordne die Wörter:\n(sometimes / in the park / they / play / football)",
           a: "They sometimes play football in the park.",
-          hint: "Ort oft vor der Zeit."
+          hint: "Ort oft vor Zeit."
         },
         {
-          q: "Ordne die Wörter:
-(at the weekend / go / we / usually / to my grandma's house)",
+          q: "Ordne die Wörter:\n(at the weekend / go / we / usually / to my grandma's house)",
           a: "We usually go to my grandma's house at the weekend.",
           hint: "Häufigkeitsadverb vor dem Vollverb."
         },
         {
-          q: "Ordne die Wörter:
-(in the afternoon / is / very tired / my father / often)",
+          q: "Ordne die Wörter:\n(in the afternoon / is / very tired / my father / often)",
           a: "My father is often very tired in the afternoon.",
           hint: "Adverb nach be."
         },
         {
-          q: "Ordne die Wörter:
-(always / wears / at school / she / her school uniform)",
+          q: "Ordne die Wörter:\n(always / wears / at school / she / her school uniform)",
           a: "She always wears her school uniform at school.",
           hint: "Subjekt – Adverb – Verb – Objekt – Ort."
         },
         {
-          q: "Ordne die Wörter:
-(watches / in the evening / TV / usually / he)",
+          q: "Ordne die Wörter:\n(watches / in the evening / TV / usually / he)",
           a: "He usually watches TV in the evening.",
           hint: "Häufigkeit vor dem Vollverb."
         }
       ];
+      const items = [];
       let i = 0;
-      while (items.length < 50) {
-        const t = templates[i % templates.length];
+      while (items.length < 100) {
+        const t = baseTemplates[i % baseTemplates.length];
         items.push({ type: "mix", q: t.q, a: t.a, hint: t.hint });
         i++;
       }
@@ -782,36 +709,36 @@
     }
 
     function generateReportedSpeechPractice() {
-      const items = [];
-      const templates = [
-        { q: 'She said, "I am tired." → She said that she _____ tired.', a: "was", hint: "am → was" },
-        { q: 'He said, "I like football." → He said that he _____ football.', a: "liked", hint: "Simple Present → Simple Past" },
-        { q: 'They said, "We are going to London." → They said that they _____ going to London.', a: "were", hint: "are → were" },
-        { q: 'She said, "I have finished." → She said that she _____ finished.', a: "had", hint: "have → had" },
-        { q: 'Tom said, "I will help you." → Tom said that he _____ help me.', a: "would", hint: "will → would" },
-        { q: 'He said, "I can swim." → He said that he _____ swim.', a: "could", hint: "can → could" },
-        { q: 'She said, "I must go now." → She said that she _____ go then.', a: "had to", hint: "must → had to" },
-        { q: 'They said, "We are happy." → They said that they _____ happy.', a: "were", hint: "are → were" },
-        { q: 'She said, "I don't know." → She said that she _____ know.', a: "didn't", hint: "don't → didn't" },
-        { q: 'He said, "I saw her yesterday." → He said that he had seen her _____.', a: "the day before", hint: "yesterday → the day before" },
-        { q: 'She said, "I will see you tomorrow." → She said that she would see me _____.', a: "the next day", hint: "tomorrow → the next day" },
-        { q: 'He asked, "Where do you live?" → He asked where I _____ .', a: "lived", hint: "do + live → lived" },
-        { q: 'She asked, "Do you like apples?" → She asked if I _____ apples.', a: "liked", hint: "Do you like → if I liked" },
-        { q: 'They asked, "Are you ready?" → They asked if I _____ ready.', a: "was", hint: "are → was" },
-        { q: 'He asked, "Can you help me?" → He asked if I _____ help him.', a: "could", hint: "can → could" }
+      const baseTemplates = [
+        { q: "I am tired. → She said that she _____ tired.",                   a: "was",           hint: "am → was" },
+        { q: "I like football. → He said that he _____ football.",             a: "liked",         hint: "like → liked" },
+        { q: "We are going to London. → They said that they _____ going to London.", a: "were",   hint: "are → were" },
+        { q: "I have finished. → She said that she _____ finished.",           a: "had",           hint: "have → had" },
+        { q: "I will help you. → Tom said that he _____ help me.",             a: "would",         hint: "will → would" },
+        { q: "I can swim. → He said that he _____ swim.",                      a: "could",         hint: "can → could" },
+        { q: "I must go now. → She said that she _____ go then.",              a: "had to",        hint: "must → had to" },
+        { q: "We are happy. → They said that they _____ happy.",               a: "were",          hint: "are → were" },
+        { q: "I don't know. → She said that she _____ know.",                  a: "didn't",        hint: "don't → didn't" },
+        { q: "I saw her yesterday. → He said that he had seen her _____.",     a: "the day before",hint: "yesterday → the day before" },
+        { q: "I will see you tomorrow. → She said that she would see me _____.", a: "the next day",hint: "tomorrow → the next day" },
+        { q: "Where do you live? → He asked where I _____.",                   a: "lived",         hint: "do + live → lived" },
+        { q: "Do you like apples? → He asked if I _____ apples.",              a: "liked",         hint: "do you like → if I liked" },
+        { q: "Are you ready? → They asked if I _____ ready.",                  a: "was",           hint: "are → was" },
+        { q: "Can you help me? → He asked if I _____ help him.",               a: "could",         hint: "can → could" }
       ];
+      const items = [];
       let i = 0;
-      while (items.length < 50) {
-        const t = templates[i % templates.length];
+      while (items.length < 100) {
+        const t = baseTemplates[i % baseTemplates.length];
         items.push({ type: "mix", q: t.q, a: t.a, hint: t.hint });
         i++;
       }
       return items;
     }
 
-    // =====================================
-    // Practice-Pools
-    // =====================================
+    // =====================
+    // PRACTICE-POOLS
+    // =====================
 
     const practicePools = {
       "simple-present":       generateSimplePresentPractice(),
@@ -831,9 +758,9 @@
       "reported-speech":      generateReportedSpeechPractice()
     };
 
-    // =====================================
-    // appData: Tenses + Grammatik-Themen
-    // =====================================
+    // =====================
+    // Erklärungen (gekürzt, aber strukturgleich)
+    // =====================
 
     const appData = [
       {
@@ -842,40 +769,37 @@
         name: "Simple Present",
         color: "from-blue-600 to-cyan-500",
         learn: {
-          intro: "Wir benutzen das Simple Present für Dinge, die regelmäßig passieren, für Fakten und für Zustände.",
+          intro: "Simple Present benutzt du für Dinge, die immer oder regelmäßig passieren.",
           bullets: [
-            "Regelmäßige Handlungen: Dinge, die du immer wieder tust.",
-            "Fakten: Dinge, die immer wahr sind.",
-            "Fahrpläne/Pläne: "The train leaves at 7.""
+            "Regelmäßige Handlungen",
+            "Fakten und Eigenschaften",
+            "Fahrpläne und wiederkehrende Zeiten"
           ],
           positive: {
-            title: "Aussagesätze",
-            rule: "Subjekt + Grundform des Verbs. Bei he / she / it kommt meistens -s an das Verb.",
-            explanation: "Nur in der 3. Person Singular (he, she, it, my brother, the dog) ändert sich die Verbform. Oft wird einfach -s angehängt, manchmal -es oder -ies.",
+            title: "Aussagen",
+            rule: "Subjekt + Verb (he/she/it: Verb + -s).",
+            explanation: "In der 3. Person Singular bekommt das Verb ein -s oder -es.",
             examples: [
               "I play football after school.",
-              "He reads a book in the evening.",
-              "She goes to school by bus."
+              "He reads a book in the evening."
             ]
           },
           negative: {
             title: "Verneinungen",
-            rule: "Subjekt + don't / doesn't + Grundform des Verbs.",
-            explanation: "Das Verb bleibt in der Grundform. Die Zeit siehst du an don't / doesn't.",
+            rule: "Subjekt + don't / doesn't + Grundform.",
+            explanation: "Nach don't / doesn't steht immer die Grundform.",
             examples: [
               "I don't like carrots.",
-              "He doesn't play tennis.",
-              "They don't live in Berlin."
+              "She doesn't play tennis."
             ]
           },
           question: {
             title: "Fragen",
-            rule: "Do / Does + Subjekt + Grundform des Verbs?",
-            explanation: "Am Satzanfang steht do oder does. Danach kommt die Person und dann das Verb in der Grundform.",
+            rule: "Do / Does + Subjekt + Grundform?",
+            explanation: "Do/does steht am Anfang der Frage.",
             examples: [
               "Do you play football?",
-              "Does she live in London?",
-              "Do they go to school by bus?"
+              "Does she live in London?"
             ]
           }
         },
@@ -887,38 +811,35 @@
         name: "Simple Past",
         color: "from-emerald-600 to-teal-500",
         learn: {
-          intro: "Wir benutzen das Simple Past für abgeschlossene Handlungen in der Vergangenheit.",
+          intro: "Simple Past beschreibt abgeschlossene Handlungen in der Vergangenheit.",
           bullets: [
-            "Etwas ist vorbei und hat nichts mit jetzt zu tun.",
-            "Oft zusammen mit Signalwörtern wie yesterday, last week, in 2010, ago."
+            "Zeitpunkt ist klar: yesterday, last week ...",
+            "Handlung ist vorbei"
           ],
           positive: {
-            title: "Aussagesätze",
-            rule: "Regelmäßige Verben: Verb + -ed. Unregelmäßige Verben: 2. Spalte (went, saw, bought ...).",
-            explanation: "Alle Personen benutzen die gleiche Verbform. Es gibt kein -s in der 3. Person.",
+            title: "Aussagen",
+            rule: "Regelmäßig: Verb + -ed; unregelmäßig: 2. Spalte.",
+            explanation: "Alle Personen benutzen die gleiche Past-Form.",
             examples: [
               "I watched TV yesterday.",
-              "She went to the park.",
-              "They bought a new car."
+              "They went to the park."
             ]
           },
           negative: {
             title: "Verneinungen",
-            rule: "Subjekt + didn't + Grundform des Verbs.",
-            explanation: "Achtung: Nach didn't steht immer die Grundform, nicht die Past-Form.",
+            rule: "Subjekt + didn't + Grundform.",
+            explanation: "Nach didn't steht wieder die Grundform.",
             examples: [
               "I didn't play football.",
-              "He didn't go home.",
-              "They didn't see the film."
+              "He didn't go home."
             ]
           },
           question: {
             title: "Fragen",
-            rule: "Did + Subjekt + Grundform des Verbs?",
-            explanation: "Am Satzanfang steht did. Das Verb steht wieder in der Grundform.",
+            rule: "Did + Subjekt + Grundform?",
+            explanation: "Did steht vorne, das Verb bleibt in der Grundform.",
             examples: [
-              "Did you watch the game?",
-              "Did she arrive on time?",
+              "Did you see the film?",
               "Where did they go?"
             ]
           }
@@ -931,87 +852,40 @@
         name: "Present Progressive",
         color: "from-indigo-600 to-purple-500",
         learn: {
-          intro: "Present Progressive benutzen wir für Handlungen, die genau jetzt passieren.",
+          intro: "Present Progressive zeigt, was gerade jetzt passiert.",
           bullets: [
-            "Etwas passiert im Moment des Sprechens.",
-            "Oder: eine vorübergehende Handlung in der Gegenwart."
+            "Handlungen im Moment des Sprechens",
+            "Vorübergehende Situationen"
           ],
           positive: {
-            title: "Aussagesätze",
-            rule: "am / is / are + Verb + -ing",
-            explanation: "Form von be richtet sich nach dem Subjekt. An das Verb hängst du -ing.",
+            title: "Aussagen",
+            rule: "am / is / are + Verb-ing",
+            explanation: "Beachte die richtige Form von be.",
             examples: [
-              "I am reading a book now.",
-              "She is talking to her friend.",
+              "I am reading a book.",
               "They are playing football."
             ]
           },
           negative: {
             title: "Verneinungen",
-            rule: "am not / isn't / aren't + Verb + -ing",
-            explanation: "Du verneinst die Form von be, nicht das Vollverb.",
+            rule: "am not / isn't / aren't + Verb-ing",
+            explanation: "Verneint wird die Form von be.",
             examples: [
-              "I am not watching TV.",
               "He isn't doing his homework.",
               "We aren't listening."
             ]
           },
           question: {
             title: "Fragen",
-            rule: "Am / Is / Are + Subjekt + Verb + -ing?",
-            explanation: "Die Form von be steht am Anfang der Frage.",
+            rule: "Am / Is / Are + Subjekt + Verb-ing?",
+            explanation: "Be steht hier am Anfang.",
             examples: [
               "Are you reading?",
-              "Is she playing the piano?",
-              "What are they doing?"
+              "What is she doing?"
             ]
           }
         },
         practice: practicePools["present-progressive"]
-      },
-      {
-        id: "will-future",
-        isTense: true,
-        name: "Will-Future",
-        color: "from-violet-600 to-fuchsia-600",
-        learn: {
-          intro: "Wir benutzen will-future für Vorhersagen, Versprechen und spontane Entscheidungen.",
-          bullets: [
-            "Du entscheidest dich im Moment des Sprechens.",
-            "Du glaubst, dass etwas in der Zukunft passieren wird."
-          ],
-          positive: {
-            title: "Aussagesätze",
-            rule: "will + Grundform des Verbs",
-            explanation: "will ist für alle Personen gleich. Das Verb bleibt in der Grundform.",
-            examples: [
-              "I will help you.",
-              "It will rain tomorrow.",
-              "They will come later."
-            ]
-          },
-          negative: {
-            title: "Verneinungen",
-            rule: "will not = won't + Grundform",
-            explanation: "Die Kurzform wird im Alltag viel benutzt.",
-            examples: [
-              "I won't go there.",
-              "He will not tell you.",
-              "They won't do it."
-            ]
-          },
-          question: {
-            title: "Fragen",
-            rule: "Will + Subjekt + Grundform?",
-            explanation: "Will steht am Satzanfang.",
-            examples: [
-              "Will you help me?",
-              "Will it rain tomorrow?",
-              "When will they arrive?"
-            ]
-          }
-        },
-        practice: practicePools["will-future"]
       },
       {
         id: "past-progressive",
@@ -1019,43 +893,122 @@
         name: "Past Progressive",
         color: "from-green-600 to-lime-600",
         learn: {
-          intro: "Past Progressive beschreibt eine Handlung, die in der Vergangenheit gerade im Verlauf war.",
+          intro: "Past Progressive beschreibt eine längere Handlung in der Vergangenheit.",
           bullets: [
-            "Oft wird sie von einer kürzeren Handlung im Simple Past unterbrochen.",
-            "Signalwörter: while, when, all day, at 6 o'clock ..."
+            "Lange Handlung, oft durch Simple Past unterbrochen",
+            "Zeitpunkt ist meist angegeben"
           ],
           positive: {
-            title: "Aussagesätze",
-            rule: "was / were + Verb + -ing",
-            explanation: "was für I, he, she, it. were für you, we, they.",
+            title: "Aussagen",
+            rule: "was / were + Verb-ing",
+            explanation: "was für I/he/she/it, were für you/we/they.",
             examples: [
               "I was reading when he came in.",
-              "They were playing football all afternoon.",
-              "She was listening to music."
+              "They were playing all afternoon."
             ]
           },
           negative: {
             title: "Verneinungen",
-            rule: "wasn't / weren't + Verb + -ing",
-            explanation: "Verneint wird wieder die Form von be.",
+            rule: "wasn't / weren't + Verb-ing",
+            explanation: "Verneint wird wieder be.",
             examples: [
-              "I wasn't sleeping.",
-              "They weren't watching TV.",
-              "He wasn't working yesterday."
+              "He wasn't sleeping.",
+              "They weren't watching TV."
             ]
           },
           question: {
             title: "Fragen",
-            rule: "Was / Were + Subjekt + Verb + -ing?",
-            explanation: "Was oder were steht am Anfang der Frage.",
+            rule: "Was / Were + Subjekt + Verb-ing?",
+            explanation: "Was/were stehen am Anfang.",
             examples: [
-              "Were you sleeping at 8 o'clock?",
-              "Was it raining?",
+              "Were you sleeping at 8?",
               "What were they doing?"
             ]
           }
         },
         practice: practicePools["past-progressive"]
+      },
+      {
+        id: "will-future",
+        isTense: true,
+        name: "Will-Future",
+        color: "from-violet-600 to-fuchsia-600",
+        learn: {
+          intro: "Will-Future benutzt du für Vorhersagen und spontane Entscheidungen.",
+          bullets: [
+            "Entscheidung im Moment",
+            "Vorhersagen über die Zukunft"
+          ],
+          positive: {
+            title: "Aussagen",
+            rule: "will + Grundform",
+            explanation: "will ist für alle Personen gleich.",
+            examples: [
+              "I will help you.",
+              "It will rain tomorrow."
+            ]
+          },
+          negative: {
+            title: "Verneinungen",
+            rule: "will not / won't + Grundform",
+            explanation: "Kurzform: won't.",
+            examples: [
+              "I won't go there.",
+              "He will not tell you."
+            ]
+          },
+          question: {
+            title: "Fragen",
+            rule: "Will + Subjekt + Grundform?",
+            explanation: "Will steht am Anfang.",
+            examples: [
+              "Will you help me?",
+              "When will they arrive?"
+            ]
+          }
+        },
+        practice: practicePools["will-future"]
+      },
+      {
+        id: "going-to-future",
+        isTense: true,
+        name: "Going-to Future",
+        color: "from-pink-600 to-rose-500",
+        learn: {
+          intro: "Going-to Future steht für fest geplante Zukunft oder klare Anzeichen.",
+          bullets: [
+            "feste Pläne",
+            "logische Folgen (man sieht schon etwas)"
+          ],
+          positive: {
+            title: "Aussagen",
+            rule: "am / is / are + going to + Grundform",
+            explanation: "Kombination aus be + going to + Verb.",
+            examples: [
+              "We are going to visit grandma.",
+              "He is going to fall."
+            ]
+          },
+          negative: {
+            title: "Verneinungen",
+            rule: "am not / isn't / aren't going to + Grundform",
+            explanation: "Wieder wird be verneint.",
+            examples: [
+              "I am not going to buy that.",
+              "They aren't going to stay."
+            ]
+          },
+          question: {
+            title: "Fragen",
+            rule: "Am / Is / Are + Subjekt + going to + Grundform?",
+            explanation: "Be steht vorn.",
+            examples: [
+              "Are you going to watch the game?",
+              "What is she going to wear?"
+            ]
+          }
+        },
+        practice: practicePools["going-to-future"]
       },
       {
         id: "present-perfect",
@@ -1065,37 +1018,34 @@
         learn: {
           intro: "Present Perfect verbindet Vergangenheit und Gegenwart.",
           bullets: [
-            "Das Ergebnis ist wichtig für jetzt.",
-            "Die Handlung ist (noch) nicht abgeschlossen oder der Zeitpunkt ist unwichtig."
+            "Ergebnis ist jetzt wichtig",
+            "Zeitpunkt ist unklar oder unwichtig"
           ],
           positive: {
-            title: "Aussagesätze",
-            rule: "have / has + 3. Form (Past Participle)",
-            explanation: "have für I, you, we, they. has für he, she, it.",
+            title: "Aussagen",
+            rule: "have / has + 3. Form",
+            explanation: "have für I/you/we/they, has für he/she/it.",
             examples: [
               "I have finished my homework.",
-              "She has been to London twice.",
-              "We have seen that film."
+              "She has seen the film."
             ]
           },
           negative: {
             title: "Verneinungen",
             rule: "haven't / hasn't + 3. Form",
-            explanation: "Verneint wird have / has.",
+            explanation: "Verneint wird have/has.",
             examples: [
-              "I haven't done my homework yet.",
-              "He hasn't called yet.",
-              "They haven't visited us."
+              "I haven't done it yet.",
+              "He hasn't called yet."
             ]
           },
           question: {
             title: "Fragen",
             rule: "Have / Has + Subjekt + 3. Form?",
-            explanation: "Have oder Has steht am Satzanfang.",
+            explanation: "Have/has steht am Anfang.",
             examples: [
-              "Have you done the shopping?",
-              "Has he finished his work?",
-              "How long have you lived here?"
+              "Have you done your homework?",
+              "Has he finished?"
             ]
           }
         },
@@ -1107,126 +1057,75 @@
         name: "Past Perfect",
         color: "from-red-600 to-orange-600",
         learn: {
-          intro: "Past Perfect beschreibt eine Handlung, die vor einer anderen Vergangenheitshandlung passiert ist.",
+          intro: "Past Perfect: etwas war schon passiert, bevor etwas anderes passierte.",
           bullets: [
-            "Vorvergangenheit: etwas war schon vorbei, bevor etwas anderes geschah.",
-            "Oft in Verbindung mit Simple Past."
+            "Vorvergangenheit",
+            "oft zusammen mit Simple Past"
           ],
           positive: {
-            title: "Aussagesätze",
+            title: "Aussagen",
             rule: "had + 3. Form",
-            explanation: "had wird für alle Personen benutzt.",
+            explanation: "had für alle Personen.",
             examples: [
               "She had done her homework before she went out.",
-              "We had eaten when he arrived.",
-              "They had left before the film started."
+              "We had eaten when he arrived."
             ]
           },
           negative: {
             title: "Verneinungen",
             rule: "hadn't + 3. Form",
-            explanation: "hadn't = had not.",
+            explanation: "Kurzform: hadn't.",
             examples: [
               "I hadn't seen him before.",
-              "They hadn't finished their work.",
-              "He hadn't read the book."
+              "They hadn't finished."
             ]
           },
           question: {
             title: "Fragen",
             rule: "Had + Subjekt + 3. Form?",
-            explanation: "Had steht am Anfang der Frage.",
+            explanation: "Had steht vorn.",
             examples: [
-              "Had you done your homework before 8 o'clock?",
-              "Had she seen the film?",
-              "Where had they gone?"
+              "Had you done it before 8?",
+              "Had she seen the film?"
             ]
           }
         },
         practice: practicePools["past-perfect"]
       },
       {
-        id: "going-to-future",
-        isTense: true,
-        name: "Going-to Future",
-        color: "from-pink-600 to-rose-500",
-        learn: {
-          intro: "Going-to Future benutzen wir für feste Pläne und logische Folgen.",
-          bullets: [
-            "Ein Plan für die Zukunft steht schon fest.",
-            "Wir sehen etwas und erkennen: Das wird gleich passieren."
-          ],
-          positive: {
-            title: "Aussagesätze",
-            rule: "am / is / are + going to + Grundform",
-            explanation: "Beachte wieder die richtige Form von be.",
-            examples: [
-              "We are going to fly to Spain next week.",
-              "He is going to fall. Look!",
-              "I am going to visit my grandma."
-            ]
-          },
-          negative: {
-            title: "Verneinungen",
-            rule: "am not / isn't / aren't + going to + Grundform",
-            explanation: "Du verneinst wieder die Form von be.",
-            examples: [
-              "I am not going to buy that car.",
-              "She isn't going to visit us.",
-              "They aren't going to stay here."
-            ]
-          },
-          question: {
-            title: "Fragen",
-            rule: "Am / Is / Are + Subjekt + going to + Grundform?",
-            explanation: "Be steht am Satzanfang.",
-            examples: [
-              "Are you going to watch the game?",
-              "What is she going to wear?",
-              "Is he going to help us?"
-            ]
-          }
-        },
-        practice: practicePools["going-to-future"]
-      },
-      // ---- Weitere Grammatik-Themen (je 50 Aufgaben) ----
-      {
         id: "if-clauses",
         isTense: false,
-        name: "If-Sätze (Type 1–3)",
+        name: "If-Sätze (1–3)",
         color: "from-sky-600 to-emerald-500",
         learn: {
-          intro: "If-Sätze beschreiben Bedingungen: Was passiert, wenn eine bestimmte Bedingung erfüllt ist.",
+          intro: "If-Sätze beschreiben Bedingungen.",
           bullets: [
-            "Type 1: reale Zukunft, etwas ist wahrscheinlich.",
-            "Type 2: unreale Gegenwart/Zukunft, Wunsch oder Traum.",
-            "Type 3: unreale Vergangenheit, man kann es nicht mehr ändern."
+            "Type 1: reale Zukunft",
+            "Type 2: unreale Gegenwart/Zukunft",
+            "Type 3: unreale Vergangenheit"
           ],
           positive: {
-            title: "Type 1 – reale Bedingung",
-            rule: "If + Simple Present, will + Grundform.",
-            explanation: "Die Bedingung ist real möglich. Oft benutzt für Versprechen oder Warnungen.",
+            title: "Type 1",
+            rule: "If + Simple Present, will + Grundform",
+            explanation: "Die Bedingung ist möglich.",
             examples: [
-              "If it rains, we will stay at home.",
-              "If you study, you will pass the test."
+              "If it rains, we will stay at home."
             ]
           },
           negative: {
-            title: "Type 2 – unreale Bedingung (Gegenwart/Zukunft)",
-            rule: "If + Simple Past, would + Grundform.",
-            explanation: "Du stellst dir etwas vor, das im Moment nicht wahr ist.",
+            title: "Type 2",
+            rule: "If + Simple Past, would + Grundform",
+            explanation: "Unrealistische oder gedachte Situation.",
             examples: [
-              "If I had more money, I would buy a car.",
-              "If he were older, he would drive a car."
+              "If I had more time, I would travel more."
             ]
           },
           question: {
-            title: "Type 3 – unreale Vergangenheit",
-            rule: "If + Past Perfect, would have + 3. Form.",
-            explanation: "Du sprichst über etwas, das in der Vergangenheit anders hätte sein können.",
+            title: "Type 3",
+            rule: "If + Past Perfect, would have + 3. Form",
+            explanation: "Nicht mehr änderbare Vergangenheit.",
             examples: [
-              "If she had worked harder, she would have passed the exam.",
-              "If we had left earlier, we would have caught the train."
+              "If she had worked harder, she would have passed."
             ]
           }
         },
@@ -1235,41 +1134,38 @@
       {
         id: "comparatives",
         isTense: false,
-        name: "Steigerungen (Comparatives & Superlatives)",
+        name: "Comparatives",
         color: "from-yellow-500 to-orange-500",
         learn: {
-          intro: "Mit Steigerungen vergleichst du Dinge: größer, schneller, am schnellsten.",
+          intro: "Mit Steigerungen vergleichst du Dinge.",
           bullets: [
-            "Comparative (Komparativ): Vergleich von zwei Dingen.",
-            "Superlative (Superlativ): Das Extrem – etwas ist am meisten oder am wenigsten."
+            "Comparative: Vergleich von zwei Dingen",
+            "Superlative: das „meiste“ oder „wenigste“"
           ],
           positive: {
             title: "Comparative",
-            rule: "Kurz: Adjektiv + -er. Lang oder zweisilbig: more + Adjektiv.",
-            explanation: "Bei manchen Wörtern gibt es unregelmäßige Formen (good → better, bad → worse).",
+            rule: "kurz: -er, lang: more + Adjektiv",
+            explanation: "good → better, bad → worse.",
             examples: [
               "Tom is taller than Jim.",
-              "This exercise is more difficult than the last one.",
-              "Today is better than yesterday."
+              "This book is more interesting."
             ]
           },
           negative: {
             title: "Superlative",
-            rule: "Kurz: the + Adjektiv + -est. Lang: the most + Adjektiv.",
-            explanation: "Superlative benutzt du meist mit the, weil nur eins am besten / größten ist.",
+            rule: "kurz: the + -est, lang: the most + Adjektiv",
+            explanation: "Immer mit the.",
             examples: [
-              "This is the tallest tree in the park.",
-              "She is the best player in our team.",
-              "Maths is the most difficult subject for me."
+              "He is the tallest student.",
+              "This is the best film."
             ]
           },
           question: {
-            title: "Typische Fehler",
-            rule: "Nie more + -er oder the most + -est.",
-            explanation: "Entscheide dich: entweder -er/-est oder more/most.",
+            title: "Fehler",
+            rule: "Nie more + -er oder most + -est.",
+            explanation: "Entweder -er/-est oder more/most.",
             examples: [
-              "NOT: more easier → CORRECT: easier",
-              "NOT: the most fastest → CORRECT: the fastest"
+              "NOT: more easier → easier"
             ]
           }
         },
@@ -1281,38 +1177,35 @@
         name: "Fragebildung",
         color: "from-cyan-600 to-blue-500",
         learn: {
-          intro: "Im Englischen steht das Hilfsverb oft vor dem Subjekt. Das nennt man Inversion.",
+          intro: "Englische Fragen brauchen meist ein Hilfsverb vor dem Subjekt.",
           bullets: [
-            "Ja/Nein-Fragen: Hilfsverb vor das Subjekt.",
-            "Fragewörter (who, what, where ...) stehen ganz vorne."
+            "Ja/Nein-Fragen: Hilfsverb + Subjekt + Verb",
+            "Wh-Fragen: Fragewort + Hilfsverb + Subjekt + Verb"
           ],
           positive: {
             title: "Ja/Nein-Fragen",
-            rule: "Hilfsverb (do/does/did, is/are/was/were) + Subjekt + Verb?",
-            explanation: "Wenn bereits ein Hilfsverb im Satz ist, benutzt du kein zusätzliches do/does/did.",
+            rule: "Do/does/did oder be/can/have + Subjekt",
+            explanation: "Wenn schon ein Hilfsverb da ist, kein do/does/did mehr.",
             examples: [
               "Do you like cats?",
-              "Did he go to school yesterday?",
-              "Is she watching TV?"
+              "Is she at home?"
             ]
           },
           negative: {
-            title: "Fragen mit Fragewort",
-            rule: "Fragewort + Hilfsverb + Subjekt + Verb?",
-            explanation: "Das Fragewort steht ganz vorne, danach kommt wieder die normale Frage-Struktur.",
+            title: "Wh-Fragen",
+            rule: "Fragewort + Hilfsverb + Subjekt + Verb",
+            explanation: "Reihenfolge bleibt gleich wie bei Ja/Nein-Fragen.",
             examples: [
               "Where do you live?",
-              "When does the film start?",
-              "Why did they leave early?"
+              "When does the film start?"
             ]
           },
           question: {
-            title: "Typische Fehler",
-            rule: "Nicht zwei Hilfsverben setzen.",
-            explanation: "NICHT: ~Where do you are?~ sondern: Where are you?",
+            title: "Typischer Fehler",
+            rule: "Nicht zwei Hilfsverben stapeln.",
+            explanation: "NICHT: Where do you are? → Where are you?",
             examples: [
-              "Where are you?",
-              "What did you do yesterday?"
+              "Where are you?"
             ]
           }
         },
@@ -1324,41 +1217,38 @@
         name: "Modalverben",
         color: "from-slate-700 to-slate-500",
         learn: {
-          intro: "Modalverben verändern die Bedeutung eines Verbs: Fähigkeit, Pflicht, Erlaubnis, Möglichkeit.",
+          intro: "Modalverben drücken Fähigkeit, Pflicht, Erlaubnis oder Möglichkeit aus.",
           bullets: [
-            "can / can't – Fähigkeit oder Möglichkeit.",
-            "must / mustn't – starke Pflicht oder Verbot.",
-            "should / shouldn't – Rat.",
-            "may / might – Möglichkeit oder höfliche Erlaubnis."
+            "can, could – Fähigkeit/Möglichkeit",
+            "must, have to – Pflicht",
+            "should – Rat",
+            "may, might – Möglichkeit/Erlaubnis"
           ],
           positive: {
-            title: "Grundform",
-            rule: "Subjekt + Modalverb + Grundform (ohne to).",
-            explanation: "Modalverben haben keine -s-Endung in der 3. Person und keine to-Infinitiv-Form.",
+            title: "Form",
+            rule: "Subjekt + Modalverb + Grundform",
+            explanation: "Modalverben haben kein -s in der 3. Person.",
             examples: [
-              "I can swim.",
-              "She must do her homework.",
-              "We should help them."
+              "He can swim.",
+              "You should study."
             ]
           },
           negative: {
             title: "Verneinungen",
-            rule: "Modalverb + not.",
-            explanation: "Viele Kurzformen sind sehr häufig: can't, mustn't, shouldn't.",
+            rule: "Modalverb + not",
+            explanation: "Kurzformen: can't, mustn't, shouldn't ...",
             examples: [
               "You mustn't smoke here.",
-              "He can't drive a car.",
-              "You shouldn't eat so much sugar."
+              "She can't drive."
             ]
           },
           question: {
             title: "Fragen",
             rule: "Modalverb + Subjekt + Grundform?",
-            explanation: "Das Modalverb rückt vor das Subjekt.",
+            explanation: "Modalverb steht vorn.",
             examples: [
               "Can you help me?",
-              "Should we start now?",
-              "May I go to the toilet?"
+              "Should we go now?"
             ]
           }
         },
@@ -1367,40 +1257,36 @@
       {
         id: "much-many",
         isTense: false,
-        name: "Much vs Many",
+        name: "Much / Many",
         color: "from-lime-500 to-emerald-500",
         learn: {
-          intro: "Im Deutschen sagen wir oft ‚viel‘. Im Englischen musst du unterscheiden, ob das Nomen zählbar ist oder nicht.",
+          intro: "Im Deutschen oft alles „viel“. Englisch unterscheidet.",
           bullets: [
-            "many + zählbare Nomen im Plural (apples, books, friends).",
-            "much + nicht zählbare Nomen (water, time, money)."
+            "many + zählbare Nomen (Plural)",
+            "much + unzählbare Nomen"
           ],
           positive: {
-            title: "Many",
+            title: "many",
             rule: "many + plural countable noun",
-            explanation: "Du kannst das Nomen zählen: one apple, two apples, three apples ...",
+            explanation: "Du kannst die Dinge zählen.",
             examples: [
-              "How many books do you have?",
-              "There are many people in the park.",
-              "She has many friends."
+              "How many books do you have?"
             ]
           },
           negative: {
-            title: "Much",
+            title: "much",
             rule: "much + uncountable noun",
-            explanation: "Du kannst das Nomen nicht in Einzelteile zählen.",
+            explanation: "keine Pluralform.",
             examples: [
-              "I don't have much time.",
-              "There isn't much water in the bottle.",
-              "She doesn't eat much sugar."
+              "We don't have much time."
             ]
           },
           question: {
-            title: "Typische Fehler",
-            rule: "Im positiven Satz benutzt man oft a lot of statt much/many.",
-            explanation: "a lot of funktioniert für zählbare und unzählbare Nomen.",
+            title: "a lot of",
+            rule: "funktioniert mit beidem",
+            explanation: "oft im positiven Satz.",
             examples: [
-              "I have a lot of books.",
+              "I have a lot of friends.",
               "She drinks a lot of water."
             ]
           }
@@ -1410,40 +1296,37 @@
       {
         id: "word-order",
         isTense: false,
-        name: "Satzbau / Wortstellung",
+        name: "Satzbau",
         color: "from-amber-600 to-red-500",
         learn: {
-          intro: "Im Englischen ist die Wortstellung sehr wichtig. Schon kleine Änderungen können die Bedeutung ändern.",
+          intro: "Englische Wortstellung ist relativ starr.",
           bullets: [
-            "Grundreihenfolge: Subjekt – Verb – Objekt – Ort – Zeit.",
-            "Adverbien der Häufigkeit (always, often, never ...) stehen meistens vor dem Vollverb."
+            "Grundfolge: Subjekt – Verb – Objekt – Ort – Zeit",
+            "Häufigkeitsadverbien meist vor dem Vollverb"
           ],
           positive: {
-            title: "Grundwortstellung",
-            rule: "Subjekt + Verb + Objekt + Ort + Zeit",
-            explanation: "Im Deutschen kannst du Satzteile verschieben, im Englischen fast nicht.",
+            title: "Grundstellung",
+            rule: "S – V – O – Ort – Zeit",
+            explanation: "Nicht wie im Deutschen wild umstellen.",
             examples: [
-              "She reads a book in her room every evening.",
-              "We play football at school on Fridays."
+              "She reads a book in her room every evening."
             ]
           },
           negative: {
-            title: "Adverbien der Häufigkeit",
-            rule: "Subjekt + (Adverb) + Verb",
-            explanation: "Nach be (am/is/are) steht das Adverb dahinter.",
+            title: "Adverbien",
+            rule: "Adverb vor dem Vollverb, nach be.",
+            explanation: "always, usually, often, sometimes, never ...",
             examples: [
-              "I always do my homework.",
               "He is never late.",
-              "They often watch TV in the evening."
+              "We often play football."
             ]
           },
           question: {
-            title: "Fehler vermeiden",
-            rule: "Kein deutsches Denken: *Sometimes I go often swimming* ist falsch.",
-            explanation: "Nur ein Adverb der Häufigkeit pro Satz und an der richtigen Stelle.",
+            title: "Typische Fehler",
+            rule: "Nicht zu viele Angaben in die Mitte quetschen.",
+            explanation: "Lieber: S – V – O – Ort – Zeit.",
             examples: [
-              "Sometimes I go swimming.",
-              "I often go swimming."
+              "We play football in the park on Fridays."
             ]
           }
         },
@@ -1452,39 +1335,36 @@
       {
         id: "reported-speech",
         isTense: false,
-        name: "Indirekte Rede (Reported Speech)",
+        name: "Indirekte Rede",
         color: "from-slate-600 to-indigo-600",
         learn: {
-          intro: "In der indirekten Rede erzählst du, was jemand gesagt hat, ohne wörtlich zu zitieren.",
+          intro: "Du gibst wieder, was jemand gesagt hat, ohne wörtlich zu zitieren.",
           bullets: [
-            "Oft machst du eine Zeitstufe zurück (backshift).",
-            "Pronomen und Zeitangaben ändern sich manchmal."
+            "oft Zeitverschiebung (backshift)",
+            "Pronomen und Zeitangaben ändern sich"
           ],
           positive: {
-            title: "Aussagesätze",
-            rule: "say / tell + that-Satz, Zeitstufe zurück",
-            explanation: "Bei tell brauchst du eine Person: He told me that ...",
+            title: "Aussagen",
+            rule: "say/tell + that-Satz",
+            explanation: "tell braucht eine Person: He told me that ...",
             examples: [
-              ""I am tired." → She said that she was tired.",
-              ""We like football." → They said that they liked football."
+              "\"I am tired.\" → She said that she was tired."
             ]
           },
           negative: {
-            title: "Zeitverschiebung (backshift)",
-            rule: "am / is → was, are → were, Simple Present → Simple Past, will → would",
-            explanation: "Wenn das Einleitungsverb in der Vergangenheit steht (said, told), rückt die Zeitstufe zurück.",
+            title: "Zeitverschiebung",
+            rule: "am/is → was, are → were, will → would, have → had",
+            explanation: "wenn Einleitung in Past (said, told).",
             examples: [
-              ""I will help you." → He said that he would help me.",
-              ""I have finished." → She said that she had finished."
+              "\"I will help you.\" → He said that he would help me."
             ]
           },
           question: {
-            title: "Fragen in indirekter Rede",
-            rule: "Fragewort + if / whether + normale Satzstellung",
-            explanation: "Kein Fragezeichen und keine Inversion mehr.",
+            title: "Fragen",
+            rule: "Fragewort + if/whether + normale Satzstellung",
+            explanation: "keine Fragewort-Stellung mehr.",
             examples: [
-              ""Where do you live?" → She asked where I lived.",
-              ""Do you like apples?" → He asked if I liked apples."
+              "\"Do you like apples?\" → He asked if I liked apples."
             ]
           }
         },
@@ -1492,37 +1372,43 @@
       }
     ];
 
-    // =====================================
-    // UI-Status
-    // =====================================
+    // =====================
+    // UI-STATUS UND FUNKTIONEN
+    // =====================
+
     let currentTenseIndex = 0;
-    let currentMode = "learn";   // 'learn' oder 'practice'
+    let currentMode = "learn";
     let currentQuestions = [];
-    let currentPracticeFilter = "all"; // 'all' | 'pos' | 'neg' | 'ques'
+    let currentPracticeFilter = "all";
 
     const navContainer = document.getElementById("nav-container");
     const mainContent  = document.getElementById("main-content");
     const floatingContainer = document.getElementById("floating-action-container");
     const filterBar = document.getElementById("tense-filter-bar");
 
-    function getRandomQuestions(allQuestions, count = 5) {
-      const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, count);
+    function getRandomQuestionsFromPool(data) {
+      const practicePool = data.practice;
+      let pool = practicePool;
+
+      if (data.isTense && currentPracticeFilter !== "all") {
+        const filtered = practicePool.filter(item => item.type === currentPracticeFilter);
+        if (filtered.length >= 5) pool = filtered;
+      }
+      return getRandomQuestions(pool, 5);
+    }
+
+    function init() {
+      renderNav();
+      renderContent();
     }
 
     window.onload = function () {
       if (appData.length > 0) {
         init();
       } else {
-        document.body.innerHTML =
-          "<div class='p-10 text-red-600 font-bold text-center'>Fehler: keine Daten geladen.</div>";
+        document.body.innerHTML = "<div class='p-10 text-red-600 font-bold text-center'>Fehler: keine Daten geladen.</div>";
       }
     };
-
-    function init() {
-      renderNav();
-      renderContent();
-    }
 
     function renderNav() {
       navContainer.innerHTML = "";
@@ -1549,7 +1435,6 @@
 
     function renderContent() {
       const data = appData[currentTenseIndex];
-      const practicePool = data.practice;
 
       mainContent.innerHTML = "";
       const container = document.createElement("div");
@@ -1625,62 +1510,60 @@
           filterBar.classList.add("hidden");
         }
 
-        let pool = practicePool;
-        if (data.isTense && currentPracticeFilter !== "all") {
-          const filtered = practicePool.filter(item => item.type === currentPracticeFilter);
-          if (filtered.length >= 5) {
-            pool = filtered;
-          }
+        if (currentQuestions.length === 0) {
+          currentQuestions = getRandomQuestionsFromPool(data);
         }
 
-        if (currentQuestions.length === 0) {
-          currentQuestions = getRandomQuestions(pool, 5);
-        }
+        const practicePool = data.practice;
+        const poolSize = practicePool.length;
 
         contentHTML = `
           <div class="space-y-4">
             <div class="flex justify-between items-center text-xs text-slate-400 font-medium">
-              <span>Aufgaben im Pool: ${practicePool.length}</span>
-              ${data.isTense ? `<span>Filter: ${
-                currentPracticeFilter === "all"
-                  ? "alle Typen"
-                  : currentPracticeFilter === "pos"
-                  ? "nur Aussagen"
-                  : currentPracticeFilter === "neg"
-                  ? "nur Verneinungen"
-                  : "nur Fragen"
-              }</span>` : ""}
+              <span>Aufgaben im Pool: ${poolSize}</span>
+              ${data.isTense
+                ? `<span>Filter: ${
+                    currentPracticeFilter === "all"
+                      ? "alle Typen"
+                      : currentPracticeFilter === "pos"
+                      ? "nur Aussagen"
+                      : currentPracticeFilter === "neg"
+                      ? "nur Verneinungen"
+                      : "nur Fragen"
+                  }</span>`
+                : ""}
             </div>
             ${currentQuestions.map((item, idx) => `
               <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 relative overflow-hidden">
-                ${data.isTense ? `
-                <div class="absolute top-0 right-0 px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-bl-xl ${
-                  item.type === "neg"
-                    ? "bg-red-100 text-red-600"
-                    : item.type === "ques"
-                    ? "bg-blue-100 text-blue-600"
-                    : "bg-green-100 text-green-600"
-                }">
-                  ${item.type === "neg" ? "Verneinung" : item.type === "ques" ? "Frage" : "Aussage"}
-                </div>` : ""}
+                ${
+                  data.isTense
+                    ? `<div class="absolute top-0 right-0 px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-bl-xl ${
+                        item.type === "neg"
+                          ? "bg-red-100 text-red-600"
+                          : item.type === "ques"
+                          ? "bg-blue-100 text-blue-600"
+                          : "bg-green-100 text-green-600"
+                      }">
+                         ${item.type === "neg" ? "Verneinung" : item.type === "ques" ? "Frage" : "Aussage"}
+                       </div>`
+                    : ""
+                }
                 <p class="whitespace-pre-line text-lg mb-3 font-medium text-slate-700 leading-relaxed pr-8">${item.q}</p>
                 <div class="flex gap-2">
                   <input type="text"
                          id="input-${idx}"
                          class="min-w-0 flex-1 bg-slate-50 border border-slate-300 rounded-xl p-3 text-lg outline-none focus:bg-white transition"
-                         placeholder="Antwort..."
-                         autocomplete="off">
+                         placeholder="Deine Lösung hier...">
                   <button onclick="checkAnswer(${idx})"
-                          class="bg-slate-800 text-white px-5 rounded-xl font-bold shadow-md hover:bg-slate-700 active:scale-95 transition">
-                    <span class="material-symbols-outlined">check</span>
+                          class="px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-white hover:bg-slate-900 active:scale-95 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-base">check</span>
+                    Prüfen
                   </button>
                 </div>
-                <div id="feedback-${idx}" class="mt-3 hidden animate-pulse"></div>
-                ${item.hint ? `
-                  <button class="text-xs text-slate-400 mt-3 font-semibold hover:text-primary transition flex items-center gap-1"
-                          onclick="this.innerText='💡 ${item.hint}'">
-                    <span class="material-symbols-outlined text-sm">lightbulb</span> Tipp?
-                  </button>` : ""}
+                <div id="feedback-${idx}" class="mt-2 text-sm"></div>
+                <div class="mt-1 text-xs text-slate-500">
+                  <span class="font-semibold">Tipp:</span> ${item.hint}
+                </div>
               </div>
             `).join("")}
           </div>
@@ -1689,101 +1572,126 @@
 
       container.innerHTML = banner + modeSwitcher + contentHTML;
       mainContent.appendChild(container);
+      mainContent.scrollTop = 0;
     }
 
     function switchMode(mode) {
+      if (mode === currentMode) return;
       currentMode = mode;
-      currentQuestions = [];
+      if (mode === "practice") {
+        currentQuestions = [];
+      }
       renderContent();
     }
 
     function reloadQuestions() {
       const data = appData[currentTenseIndex];
-      const practicePool = data.practice;
-      let pool = practicePool;
-
-      if (data.isTense && currentPracticeFilter !== "all") {
-        const filtered = practicePool.filter(item => item.type === currentPracticeFilter);
-        if (filtered.length >= 5) {
-          pool = filtered;
-        }
-      }
-      currentQuestions = getRandomQuestions(pool, 5);
-      renderContent();
-      document.getElementById("main-content").scrollTop = 0;
-    }
-
-    function softReset() {
-      currentMode = "learn";
-      currentQuestions = [];
-      currentPracticeFilter = "all";
+      currentQuestions = getRandomQuestionsFromPool(data);
       renderContent();
     }
 
     function updateFilterButtons() {
-      const btns = document.querySelectorAll(".filter-btn");
-      btns.forEach(btn => {
+      const buttons = document.querySelectorAll(".filter-btn");
+      buttons.forEach(btn => {
         const filter = btn.getAttribute("data-filter");
+        if (filter === currentPracticeFilter) {
+          btn.classList.add("bg-slate-800", "text-white", "border-slate-800");
+          btn.classList.remove("bg-white", "text-slate-600");
+        } else {
+          btn.classList.remove("bg-slate-800", "text-white", "border-slate-800");
+          btn.classList.add("bg-white", "text-slate-600", "border-slate-300");
+        }
         btn.onclick = () => {
           currentPracticeFilter = filter;
           currentQuestions = [];
           renderContent();
         };
-        if (filter === currentPracticeFilter) {
-          btn.classList.add("bg-slate-800", "text-white", "border-slate-800");
-          btn.classList.remove("bg-white", "text-slate-600", "border-slate-200");
-        } else {
-          btn.classList.remove("bg-slate-800", "text-white", "border-slate-800");
-          btn.classList.add("bg-white", "text-slate-600", "border-slate-200");
-        }
       });
     }
 
-    function checkAnswer(idx) {
-      const correct  = currentQuestions[idx].a;
-      const input    = document.getElementById(`input-${idx}`);
-      const feedback = document.getElementById(`feedback-${idx}`);
-      const userVal  = input.value.trim();
+    function normalizeAnswer(str) {
+      return str
+        .toLowerCase()
+        .replace(/[.!?]/g, "")      // Satzzeichen weg
+        .replace(/\s+/g, " ")       // Mehrfach-Leerzeichen zu einem
+        .trim();
+    }
 
-      feedback.classList.remove("hidden", "animate-pulse");
-
-      const normalize = (str) => {
-        return str.toLowerCase()
-          .replace(/\s+/g, " ")
-          .replace(/’/g, "'")
-          .replace(/don't/g, "do not")
-          .replace(/doesn't/g, "does not")
-          .replace(/didn't/g, "did not")
-          .replace(/won't/g, "will not")
-          .replace(/can't/g, "cannot")
-          .replace(/isn't/g, "is not")
-          .replace(/aren't/g, "are not")
-          .replace(/wasn't/g, "was not")
-          .replace(/weren't/g, "were not")
-          .replace(/haven't/g, "have not")
-          .replace(/hasn't/g, "has not")
-          .replace(/hadn't/g, "had not");
+    function canonicalize(str) {
+      let s = normalizeAnswer(str);
+      const map = {
+        "isn't": "is not",
+        "aren't": "are not",
+        "wasn't": "was not",
+        "weren't": "were not",
+        "don't": "do not",
+        "doesn't": "does not",
+        "didn't": "did not",
+        "haven't": "have not",
+        "hasn't": "has not",
+        "hadn't": "had not",
+        "won't": "will not",
+        "can't": "can not",
+        "couldn't": "could not",
+        "mustn't": "must not",
+        "shouldn't": "should not",
+        "mightn't": "might not"
       };
-
-      const cleanUser    = normalize(userVal);
-      const cleanCorrect = normalize(correct);
-
-      if (cleanUser === cleanCorrect) {
-        input.className =
-          "min-w-0 flex-1 bg-green-50 border-2 border-green-500 text-green-800 rounded-xl p-3 text-lg outline-none font-medium";
-        feedback.innerHTML =
-          '<div class="bg-green-100 text-green-700 p-2 rounded-lg text-sm font-bold flex items-center gap-2">' +
-          '<span class="material-symbols-outlined">check_circle</span> Richtig!' +
-          "</div>";
-      } else {
-        input.className =
-          "min-w-0 flex-1 bg-red-50 border-2 border-red-500 text-red-800 rounded-xl p-3 text-lg outline-none font-medium";
-        feedback.innerHTML =
-          '<div class="bg-red-100 text-red-700 p-2 rounded-lg text-sm font-medium flex items-center gap-2">' +
-          '<span class="material-symbols-outlined">cancel</span> Leider falsch. <br>Lösung: ' +
-          `<span class="font-bold underline ml-1">${correct}</span></div>`;
+      for (const key in map) {
+        const re = new RegExp("\\b" + key + "\\b", "g");
+        s = s.replace(re, map[key]);
       }
+      return s;
+    }
+
+    function checkAnswer(index) {
+      const item = currentQuestions[index];
+      if (!item) return;
+
+      const input = document.getElementById(`input-${index}`);
+      const feedback = document.getElementById(`feedback-${index}`);
+      if (!input || !feedback) return;
+
+      const userRaw = input.value;
+      const correctRaw = item.a;
+
+      const user = canonicalize(userRaw);
+      const correct = canonicalize(correctRaw);
+
+      if (!user) {
+        feedback.innerHTML = `<span class="text-amber-600 text-sm flex items-center gap-1">
+          <span class="material-symbols-outlined text-base">info</span> Bitte gib erst eine Antwort ein.
+        </span>`;
+        return;
+      }
+
+      if (user === correct) {
+        feedback.innerHTML = `<span class="text-emerald-600 text-sm flex items-center gap-1">
+          <span class="material-symbols-outlined text-base">check_circle</span> Richtig! (${correctRaw})
+        </span>`;
+      } else {
+        feedback.innerHTML = `
+          <div class="text-red-600 text-sm flex items-start gap-1">
+            <span class="material-symbols-outlined text-base mt-[2px]">cancel</span>
+            <div>
+              <div>Leider nicht ganz richtig.</div>
+              <div class="text-slate-700"><span class="font-semibold">Lösung:</span> ${correctRaw}</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function softReset() {
+      currentTenseIndex = 0;
+      currentMode = "learn";
+      currentQuestions = [];
+      currentPracticeFilter = "all";
+      renderNav();
+      renderContent();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   </script>
 </body>
 </html>
+
