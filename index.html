@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Tenses Master</title>
-    
+    <title>TenseMaster</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
@@ -14,42 +12,19 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#2563eb', // Royal Blue
-                        secondary: '#475569', // Slate
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { primary: '#2563eb', secondary: '#475569' }
                 }
             }
         }
     </script>
 
     <style>
-        /* Hide scrollbar for Chrome, Safari and Opera */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        /* Hide scrollbar for IE, Edge and Firefox */
-        .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Material Icon Alignment */
-        .material-symbols-outlined {
-            vertical-align: bottom;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .material-symbols-outlined { vertical-align: bottom; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen flex flex-col overflow-hidden">
@@ -57,19 +32,16 @@
     <header class="bg-white shadow-sm z-10 flex-none">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <h1 class="text-xl font-bold text-primary tracking-tight">TenseMaster</h1>
-            <button onclick="alert('Version 1.0 - Created by Andreas')" class="text-slate-400 hover:text-primary transition">
+            <button onclick="alert('TenseMaster v1.0\nCreated for my students.')" class="text-slate-400 hover:text-primary transition">
                 <span class="material-symbols-outlined">info</span>
             </button>
         </div>
-        
         <nav class="border-b border-slate-200">
-            <div class="max-w-4xl mx-auto flex overflow-x-auto no-scrollbar py-2 px-2 gap-2" id="nav-container">
-                </div>
+            <div class="max-w-4xl mx-auto flex overflow-x-auto no-scrollbar py-2 px-2 gap-2" id="nav-container"></div>
         </nav>
     </header>
 
-    <main class="flex-grow overflow-y-auto p-4" id="main-content">
-        </main>
+    <main class="flex-grow overflow-y-auto p-4" id="main-content"></main>
 
     <div id="table-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
@@ -79,309 +51,235 @@
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <div class="p-0 overflow-auto" id="modal-body">
-                </div>
+            <div class="p-0 overflow-auto" id="modal-body"></div>
         </div>
     </div>
 
     <script>
-        // --- 1. DATA STRUCTURE (The "Brain") ---
+        // --- DATA STRUCTURE (ALLE ZEITFORMEN) ---
         const appData = [
             {
                 id: 'simple-present',
                 name: 'Simple Present',
-                category: 'Basic',
                 learn: {
-                    intro: "Das Simple Present beschreibt Handlungen, die regelmäßig stattfinden, Fakten oder allgemeingültige Aussagen.",
+                    intro: "Fakten, regelmäßige Handlungen, Zustände.",
                     signalWords: ["always", "often", "usually", "sometimes", "never", "every day"],
-                    formation: "Subjekt + Verb (bei 'he/she/it' das 's' muss mit!)",
-                    exampleImage: "https://placehold.co/600x300/e2e8f0/1e293b?text=He+plays+football", // Fallback placeholder
-                    examples: [
-                        { en: "I walk to school.", de: "Ich laufe zur Schule." },
-                        { en: "She reads a book.", de: "Sie liest ein Buch." }
-                    ]
+                    formation: "Subjekt + Verb (he/she/it: das 's' muss mit!)",
+                    examples: [{ en: "He plays football.", de: "Er spielt Fußball." }, { en: "We go to school.", de: "Wir gehen zur Schule." }]
                 },
                 practice: [
-                    { q: "She _____ (to play) tennis every Sunday.", a: "plays", hint: "Denk an das 's' bei he/she/it!" },
-                    { q: "We _____ (to go) to the cinema.", a: "go", hint: "Kein 's' bei 'we'." },
+                    { q: "She _____ (to read) a book every day.", a: "reads", hint: "He/She/It -> s" },
+                    { q: "We _____ (to live) in London.", a: "live", hint: "Kein 's' bei we" },
                     { q: "Tom _____ (to like) pizza.", a: "likes", hint: "" }
                 ],
-                table: {
-                    positive: "I play / He plays",
-                    negative: "I do not play / He does not play",
-                    question: "Do I play? / Does he play?"
-                }
+                table: { pos: "I play / He plays", neg: "I don't play / He doesn't play", ques: "Do I play? / Does he play?" }
             },
             {
                 id: 'present-progressive',
                 name: 'Present Progressive',
-                category: 'Basic',
                 learn: {
-                    intro: "Verwende das Present Progressive für Handlungen, die JETZT gerade passieren.",
-                    signalWords: ["now", "at the moment", "look!", "listen!"],
-                    formation: "Subjekt + form of 'to be' (am/is/are) + Verb + ing",
-                    exampleImage: "https://placehold.co/600x300/e2e8f0/1e293b?text=They+are+running",
-                    examples: [
-                        { en: "I am writing a text.", de: "Ich schreibe gerade einen Text." },
-                        { en: "Look! He is running.", de: "Schau! Er rennt." }
-                    ]
+                    intro: "Handlungen, die JETZT gerade passieren.",
+                    signalWords: ["now", "at the moment", "Look!", "Listen!"],
+                    formation: "am / is / are + Verb-ing",
+                    examples: [{ en: "I am writing.", de: "Ich schreibe gerade." }, { en: "Look! He is running.", de: "Schau! Er rennt." }]
                 },
                 practice: [
-                    { q: "Listen! She _____ (to sing).", a: "is singing", hint: "am / is / are + ing" },
-                    { q: "They _____ (to play) football right now.", a: "are playing", hint: "" }
+                    { q: "Listen! She _____ (to sing).", a: "is singing", hint: "to be + ing" },
+                    { q: "They _____ (to play) now.", a: "are playing", hint: "Mehrzahl -> are" },
+                    { q: "I _____ (to do) my homework.", a: "am doing", hint: "I -> am" }
                 ],
-                table: {
-                    positive: "I am playing / He is playing",
-                    negative: "I am not playing / He is not playing",
-                    question: "Am I playing? / Is he playing?"
-                }
+                table: { pos: "I am playing", neg: "I am not playing", ques: "Am I playing?" }
             },
             {
                 id: 'simple-past',
                 name: 'Simple Past',
-                category: 'Advanced', // Just for demo grouping
                 learn: {
                     intro: "Abgeschlossene Handlungen in der Vergangenheit.",
                     signalWords: ["yesterday", "last week", "in 2010", "ago"],
-                    formation: "Regelmäßig: Verb + ed. Unregelmäßig: 2. Spalte!",
-                    exampleImage: "https://placehold.co/600x300/e2e8f0/1e293b?text=I+visited+Paris",
-                    examples: [
-                        { en: "I visited my grandma.", de: "Ich besuchte meine Oma." },
-                        { en: "He went to school.", de: "Er ging zur Schule." }
-                    ]
+                    formation: "Regelmäßig: -ed. Unregelmäßig: 2. Spalte!",
+                    examples: [{ en: "I visited London.", de: "Ich besuchte London." }, { en: "He went home.", de: "Er ging nach Hause." }]
                 },
                 practice: [
-                    { q: "I _____ (to watch) TV yesterday.", a: "watched", hint: "Regelmäßiges Verb (+ed)" },
-                    { q: "We _____ (to buy) a new car.", a: "bought", hint: "Unregelmäßig!" }
+                    { q: "I _____ (to watch) TV yesterday.", a: "watched", hint: "Regelmäßig (+ed)" },
+                    { q: "We _____ (to go) to the park.", a: "went", hint: "Unregelmäßig (go -> went)" },
+                    { q: "She _____ (to buy) a car.", a: "bought", hint: "buy -> bought" }
                 ],
-                table: {
-                    positive: "I played / I went",
-                    negative: "I did not play / I did not go",
-                    question: "Did I play? / Did I go?"
-                }
+                table: { pos: "I played / I went", neg: "I didn't play / I didn't go", ques: "Did I play? / Did I go?" }
+            },
+            {
+                id: 'past-progressive',
+                name: 'Past Progressive',
+                learn: {
+                    intro: "Handlungen, die in der Vergangenheit gerade andauerten.",
+                    signalWords: ["while", "when (Simp. Past unterbricht)"],
+                    formation: "was / were + Verb-ing",
+                    examples: [{ en: "I was reading when he came.", de: "Ich las gerade, als er kam." }, { en: "They were playing.", de: "Sie spielten gerade." }]
+                },
+                practice: [
+                    { q: "I _____ (to sleep) when you called.", a: "was sleeping", hint: "was/were + ing" },
+                    { q: "They _____ (to wait) for the bus.", a: "were waiting", hint: "Mehrzahl -> were" },
+                    { q: "He _____ (to work) all day.", a: "was working", hint: "" }
+                ],
+                table: { pos: "I was playing", neg: "I wasn't playing", ques: "Was I playing?" }
+            },
+            {
+                id: 'present-perfect',
+                name: 'Present Perfect',
+                learn: {
+                    intro: "Ergebnis wichtig oder Handlung begann in Vergangenheit und dauert an.",
+                    signalWords: ["just", "yet", "never", "ever", "already", "since", "for"],
+                    formation: "have / has + 3. Spalte (Participle)",
+                    examples: [{ en: "I have lost my key.", de: "Ich habe meinen Schlüssel verloren." }, { en: "She has gone.", de: "Sie ist gegangen." }]
+                },
+                practice: [
+                    { q: "I _____ (to finish) my homework.", a: "have finished", hint: "have/has + ed/3.Spalte" },
+                    { q: "She _____ (to be) to London twice.", a: "has been", hint: "He/She/It -> has" },
+                    { q: "We _____ (to see) that movie.", a: "have seen", hint: "see -> saw -> seen" }
+                ],
+                table: { pos: "I have played", neg: "I haven't played", ques: "Have I played?" }
+            },
+            {
+                id: 'past-perfect',
+                name: 'Past Perfect',
+                learn: {
+                    intro: "Vorvergangenheit. Passierte VOR einer anderen Handlung in der Vergangenheit.",
+                    signalWords: ["before", "after"],
+                    formation: "had + 3. Spalte",
+                    examples: [{ en: "After I had eaten, I slept.", de: "Nachdem ich gegessen hatte, schlief ich." }]
+                },
+                practice: [
+                    { q: "She went home after she _____ (to do) the shopping.", a: "had done", hint: "had + 3. Spalte" },
+                    { q: "The train _____ (to leave) before I arrived.", a: "had left", hint: "leave -> left -> left" }
+                ],
+                table: { pos: "I had played", neg: "I had not played", ques: "Had I played?" }
+            },
+            {
+                id: 'will-future',
+                name: 'Will Future',
+                learn: {
+                    intro: "Spontane Entschlüsse, Vorhersagen, Versprechen.",
+                    signalWords: ["tomorrow", "next year", "in the future", "I think", "I hope"],
+                    formation: "will + Infinitiv",
+                    examples: [{ en: "I think it will rain.", de: "Ich glaube, es wird regnen." }, { en: "I will help you.", de: "Ich werde dir helfen." }]
+                },
+                practice: [
+                    { q: "Wait, I _____ (to help) you.", a: "will help", hint: "Spontan -> will" },
+                    { q: "It _____ (to be) cold tomorrow.", a: "will be", hint: "Vorhersage" },
+                    { q: "I promise I _____ (to call).", a: "will call", hint: "Versprechen" }
+                ],
+                table: { pos: "I will play", neg: "I won't play", ques: "Will I play?" }
+            },
+            {
+                id: 'going-to-future',
+                name: 'Going-to Future',
+                learn: {
+                    intro: "Feste Pläne oder logische Konsequenz (man sieht es kommen).",
+                    signalWords: ["tomorrow", "next week", "planned"],
+                    formation: "am / is / are + going to + Infinitiv",
+                    examples: [{ en: "I am going to buy a car.", de: "Ich habe vor, ein Auto zu kaufen." }, { en: "Look at the clouds! It is going to rain.", de: "Es wird gleich regnen." }]
+                },
+                practice: [
+                    { q: "We _____ (to fly) to Spain next week.", a: "are going to fly", hint: "Plan -> going to" },
+                    { q: "Look! He _____ (to fall).", a: "is going to fall", hint: "Man sieht es -> going to" }
+                ],
+                table: { pos: "I am going to play", neg: "I am not going to play", ques: "Am I going to play?" }
             }
         ];
 
-        // --- 2. STATE MANAGEMENT ---
+        // --- STATE & LOGIC ---
         let currentTenseIndex = 0;
-        let currentMode = 'learn'; // 'learn' or 'practice'
+        let currentMode = 'learn';
 
-        // --- 3. DOM ELEMENTS ---
         const navContainer = document.getElementById('nav-container');
         const mainContent = document.getElementById('main-content');
         const modal = document.getElementById('table-modal');
         const modalBody = document.getElementById('modal-body');
         const modalTitle = document.getElementById('modal-title');
 
-        // --- 4. INITIALIZATION ---
-        function init() {
-            renderNav();
-            renderContent();
-        }
+        function init() { renderNav(); renderContent(); }
 
-        // --- 5. RENDER FUNCTIONS ---
-        
-        // Render Navigation (Horizontal Scroll)
         function renderNav() {
             navContainer.innerHTML = '';
             appData.forEach((tense, index) => {
                 const btn = document.createElement('button');
                 const isActive = index === currentTenseIndex;
-                
-                // Style logic for active/inactive tabs
-                let classes = "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 border ";
-                classes += isActive 
-                    ? "bg-primary text-white border-primary shadow-md" 
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50";
-
-                btn.className = classes;
+                btn.className = `px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 border ${isActive ? "bg-primary text-white border-primary shadow-md" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`;
                 btn.textContent = tense.name;
-                btn.onclick = () => {
-                    currentTenseIndex = index;
-                    currentMode = 'learn'; // Reset to learn mode on switch
-                    renderNav();
-                    renderContent();
-                };
+                btn.onclick = () => { currentTenseIndex = index; currentMode = 'learn'; renderNav(); renderContent(); };
                 navContainer.appendChild(btn);
             });
         }
 
-        // Main Content Router
         function renderContent() {
             const data = appData[currentTenseIndex];
-            mainContent.innerHTML = ''; // Clear current
-
+            mainContent.innerHTML = '';
             const container = document.createElement('div');
-            container.className = "max-w-2xl mx-auto fade-in pb-20"; // pb-20 for scrolling space
+            container.className = "max-w-2xl mx-auto fade-in pb-20";
 
-            // Mode Switcher (Learn / Practice)
             const modeSwitcher = `
                 <div class="flex bg-slate-200 p-1 rounded-lg mb-6">
-                    <button onclick="switchMode('learn')" class="flex-1 py-2 rounded-md text-sm font-semibold transition ${currentMode === 'learn' ? 'bg-white text-primary shadow-sm' : 'text-slate-500'}">
-                        <span class="material-symbols-outlined text-lg mr-1">school</span> Lernen
-                    </button>
-                    <button onclick="switchMode('practice')" class="flex-1 py-2 rounded-md text-sm font-semibold transition ${currentMode === 'practice' ? 'bg-white text-primary shadow-sm' : 'text-slate-500'}">
-                        <span class="material-symbols-outlined text-lg mr-1">edit_note</span> Üben
-                    </button>
+                    <button onclick="switchMode('learn')" class="flex-1 py-2 rounded-md text-sm font-semibold transition ${currentMode === 'learn' ? 'bg-white text-primary shadow-sm' : 'text-slate-500'}"><span class="material-symbols-outlined text-lg mr-1 align-bottom">school</span> Lernen</button>
+                    <button onclick="switchMode('practice')" class="flex-1 py-2 rounded-md text-sm font-semibold transition ${currentMode === 'practice' ? 'bg-white text-primary shadow-sm' : 'text-slate-500'}"><span class="material-symbols-outlined text-lg mr-1 align-bottom">edit_note</span> Üben</button>
                 </div>
             `;
-            
-            // Cheat Sheet Button
-            const cheatSheetBtn = `
-                <button onclick="openTable()" class="w-full mb-6 bg-slate-800 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 shadow-lg active:scale-95 transition">
-                    <span class="material-symbols-outlined text-yellow-400">table_view</span>
-                    Zeige Cheat Sheet (${data.name})
-                </button>
-            `;
+            const cheatSheetBtn = `<button onclick="openTable()" class="w-full mb-6 bg-slate-800 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 shadow-lg active:scale-95 transition"><span class="material-symbols-outlined text-yellow-400">table_view</span>Cheat Sheet</button>`;
 
             let contentHTML = "";
-
             if (currentMode === 'learn') {
-                // LEARN MODULE
                 contentHTML = `
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="h-48 bg-slate-200 w-full relative group">
-                            <img src="${data.learn.exampleImage}" class="w-full h-full object-cover" alt="Example" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                            <div class="hidden w-full h-full absolute top-0 left-0 flex items-center justify-center text-slate-400 bg-slate-100">
-                                <span class="material-symbols-outlined text-4xl">image_not_supported</span>
-                            </div>
-                        </div>
-                        
-                        <div class="p-6">
-                            <h2 class="text-2xl font-bold text-slate-800 mb-2">${data.name}</h2>
-                            <p class="text-slate-600 mb-6 leading-relaxed">${data.learn.intro}</p>
-                            
-                            <div class="mb-6">
-                                <h3 class="text-sm uppercase tracking-wide text-slate-400 font-bold mb-2">Signalwörter</h3>
-                                <div class="flex flex-wrap gap-2">
-                                    ${data.learn.signalWords.map(w => `<span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium">${w}</span>`).join('')}
-                                </div>
-                            </div>
-
-                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                <h3 class="text-sm uppercase tracking-wide text-slate-400 font-bold mb-2">Bildung</h3>
-                                <p class="font-mono text-primary font-medium">${data.learn.formation}</p>
-                            </div>
-
-                            <div class="mt-6">
-                                <h3 class="text-sm uppercase tracking-wide text-slate-400 font-bold mb-2">Beispiele</h3>
-                                <ul class="space-y-3">
-                                    ${data.learn.examples.map(ex => `
-                                        <li class="flex items-start gap-3">
-                                            <span class="material-symbols-outlined text-green-500 mt-0.5">check_circle</span>
-                                            <div>
-                                                <p class="font-medium text-slate-800">${ex.en}</p>
-                                                <p class="text-sm text-slate-500 italic">${ex.de}</p>
-                                            </div>
-                                        </li>
-                                    `).join('')}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2">${data.name}</h2>
+                        <p class="text-slate-600 mb-6">${data.learn.intro}</p>
+                        <div class="mb-6"><h3 class="text-xs uppercase tracking-wide text-slate-400 font-bold mb-2">Signalwörter</h3><div class="flex flex-wrap gap-2">${data.learn.signalWords.map(w => `<span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium">${w}</span>`).join('')}</div></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6"><h3 class="text-xs uppercase tracking-wide text-slate-400 font-bold mb-2">Bildung</h3><p class="font-mono text-primary font-medium">${data.learn.formation}</p></div>
+                        <div><h3 class="text-xs uppercase tracking-wide text-slate-400 font-bold mb-2">Beispiele</h3><ul class="space-y-3">${data.learn.examples.map(ex => `<li class="flex items-start gap-3"><span class="material-symbols-outlined text-green-500 text-sm mt-1">check_circle</span><div><p class="font-medium text-slate-800">${ex.en}</p><p class="text-sm text-slate-500 italic">${ex.de}</p></div></li>`).join('')}</ul></div>
+                    </div>`;
             } else {
-                // PRACTICE MODULE
-                contentHTML = `
-                    <div class="space-y-4">
-                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded-r-lg">
-                            <p class="text-blue-700 text-sm">Fülle die Lücken aus. Achte auf die korrekte Form!</p>
-                        </div>
-                        ${data.practice.map((item, idx) => `
-                            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 relative" id="card-${idx}">
-                                <p class="text-lg mb-3 font-medium text-slate-700">${item.q}</p>
-                                <div class="flex gap-2">
-                                    <input type="text" id="input-${idx}" class="flex-1 bg-slate-50 border border-slate-300 text-slate-900 text-lg rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 outline-none transition" placeholder="Antwort...">
-                                    <button onclick="checkAnswer(${idx}, '${item.a}')" class="bg-primary text-white px-4 rounded-lg font-medium hover:bg-blue-700 transition">
-                                        Check
-                                    </button>
-                                </div>
-                                <div id="feedback-${idx}" class="mt-2 hidden"></div>
-                                ${item.hint ? `<p class="text-xs text-slate-400 mt-2 cursor-pointer hover:text-slate-600" onclick="this.innerText='💡 ${item.hint}'">Zeige Hinweis</p>` : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
+                contentHTML = `<div class="space-y-4">${data.practice.map((item, idx) => `
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+                        <p class="text-lg mb-3 font-medium text-slate-700">${item.q}</p>
+                        <div class="flex gap-2"><input type="text" id="input-${idx}" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Antwort..."><button onclick="checkAnswer(${idx}, '${item.a}')" class="bg-primary text-white px-4 rounded-lg font-medium">Check</button></div>
+                        <div id="feedback-${idx}" class="mt-2 hidden"></div>
+                        ${item.hint ? `<p class="text-xs text-slate-400 mt-2 cursor-pointer" onclick="this.innerText='💡 ${item.hint}'">Tipp?</p>` : ''}
+                    </div>`).join('')}</div>`;
             }
-
             container.innerHTML = modeSwitcher + cheatSheetBtn + contentHTML;
             mainContent.appendChild(container);
         }
 
-        // --- 6. INTERACTION LOGIC ---
-
-        function switchMode(mode) {
-            currentMode = mode;
-            renderContent();
-        }
-
+        function switchMode(mode) { currentMode = mode; renderContent(); }
+        
         function checkAnswer(idx, correct) {
             const input = document.getElementById(`input-${idx}`);
             const feedback = document.getElementById(`feedback-${idx}`);
-            const userVal = input.value.trim();
-
+            const userVal = input.value.trim(); // Case insensitive check
             feedback.classList.remove('hidden');
-            
             if (userVal.toLowerCase() === correct.toLowerCase()) {
-                input.classList.remove('border-slate-300', 'border-red-500');
-                input.classList.add('border-green-500', 'bg-green-50');
-                feedback.innerHTML = `<span class="text-green-600 font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm">check</span> Korrekt!</span>`;
+                input.className = "flex-1 bg-green-50 border border-green-500 rounded-lg p-2.5 outline-none";
+                feedback.innerHTML = `<span class="text-green-600 font-bold text-sm">Richtig!</span>`;
             } else {
-                input.classList.remove('border-slate-300', 'border-green-500');
-                input.classList.add('border-red-500', 'bg-red-50');
-                feedback.innerHTML = `<span class="text-red-600 font-medium flex items-center gap-1"><span class="material-symbols-outlined text-sm">close</span> Falsch. Richtig: <b>${correct}</b></span>`;
+                input.className = "flex-1 bg-red-50 border border-red-500 rounded-lg p-2.5 outline-none";
+                feedback.innerHTML = `<span class="text-red-600 font-medium text-sm">Falsch. Richtig: <b>${correct}</b></span>`;
             }
         }
 
-        // --- 7. MODAL LOGIC (CHEAT SHEET) ---
-
         function openTable() {
             const data = appData[currentTenseIndex];
-            modalTitle.textContent = `${data.name} - Übersicht`;
-            
+            modalTitle.textContent = `${data.name} Cheat Sheet`;
             modalBody.innerHTML = `
                 <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-100 text-slate-600 text-sm uppercase tracking-wider">
-                            <th class="p-4 border-b">Typ</th>
-                            <th class="p-4 border-b">Beispiel</th>
-                        </tr>
-                    </thead>
                     <tbody class="text-slate-700 divide-y divide-slate-100">
-                        <tr>
-                            <td class="p-4 font-semibold text-green-600"><span class="material-symbols-outlined align-middle mr-1">add_circle</span> Positiv</td>
-                            <td class="p-4">${data.table.positive}</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-semibold text-red-500"><span class="material-symbols-outlined align-middle mr-1">cancel</span> Negativ</td>
-                            <td class="p-4">${data.table.negative}</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-semibold text-blue-500"><span class="material-symbols-outlined align-middle mr-1">help</span> Frage</td>
-                            <td class="p-4">${data.table.question}</td>
-                        </tr>
+                        <tr><td class="p-4 font-semibold text-green-600"><span class="material-symbols-outlined align-bottom mr-1 text-sm">add</span> Positiv</td><td class="p-4 text-sm">${data.table.pos}</td></tr>
+                        <tr><td class="p-4 font-semibold text-red-500"><span class="material-symbols-outlined align-bottom mr-1 text-sm">remove</span> Negativ</td><td class="p-4 text-sm">${data.table.neg}</td></tr>
+                        <tr><td class="p-4 font-semibold text-blue-500"><span class="material-symbols-outlined align-bottom mr-1 text-sm">help</span> Frage</td><td class="p-4 text-sm">${data.table.ques}</td></tr>
                     </tbody>
-                </table>
-                <div class="p-4 bg-yellow-50 text-yellow-800 text-sm">
-                    <p><strong>Tipp:</strong> Achte auf Signalwörter wie: <em>${data.learn.signalWords.join(', ')}</em></p>
-                </div>
-            `;
-            
+                </table>`;
             modal.classList.remove('hidden');
         }
+        function closeModal() { modal.classList.add('hidden'); }
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-        function closeModal() {
-            modal.classList.add('hidden');
-        }
-
-        // Close modal on click outside
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-
-        // Start the app
         init();
-
     </script>
 </body>
 </html>
