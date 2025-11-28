@@ -28,7 +28,6 @@
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden">
-  <!-- HEADER -->
   <header class="bg-white shadow-sm z-20 flex-none">
     <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center gap-3">
@@ -58,10 +57,8 @@
     </div>
   </header>
 
-  <!-- MAIN -->
   <main class="flex-grow overflow-y-auto p-4 relative" id="main-content"></main>
 
-  <!-- FOOTER ACTION -->
   <div id="floating-action-container" class="fixed bottom-4 left-4 right-4 z-30 hidden">
     <div class="max-w-3xl mx-auto flex flex-col gap-2">
       <div id="tense-filter-bar" class="hidden bg-white border border-slate-200 rounded-2xl shadow-sm px-3 py-2 flex items-center justify-between text-xs">
@@ -582,7 +579,7 @@
         { q: "What _____ (she / to do) at the moment?",   a: "is she doing",           hint: "is + she + Verb-ing" },
         { q: "How long _____ (you / to live) here?",      a: "have you lived",         hint: "Present Perfect" },
         { q: "_____ (he / to have) a dog?",               a: "Does he have",           hint: "have als Vollverb" },
-        { q: "Who _____ (to help) you with your homework?", a: "helps",               hint: "Who + Verb (kein do/does)" },
+        { q: "Who _____ (to help) you with your homework?", a: "helps",                hint: "Who + Verb (kein do/does)" },
         { q: "What time _____ (the film / to start)?",    a: "does the film start",    hint: "Fragewort + does" },
         { q: "Why _____ (they / to be) late?",            a: "are they",               hint: "be vor dem Subjekt" }
       ];
@@ -598,18 +595,18 @@
 
     function generateModalVerbsPractice() {
       const baseTemplates = [
-        { q: "You _____ (can) swim very well.",                      a: "can",       hint: "Modalverb + Grundform" },
-        { q: "She _____ (must) do her homework.",                    a: "must",      hint: "starke Pflicht" },
-        { q: "We _____ (should) help our parents.",                  a: "should",    hint: "Rat geben" },
-        { q: "They _____ (must not) be late.",                       a: "must not",  hint: "Verbot: mustn't" },
-        { q: "I _____ (may) go to the party.",                       a: "may",       hint: "vielleicht dürfen" },
-        { q: "You _____ (should not) eat so much fast food.",        a: "should not",hint: "shouldn't" },
-        { q: "He _____ (can't) play the piano.",                     a: "can't",     hint: "can not" },
-        { q: "We _____ (might) see him tomorrow.",                   a: "might",     hint: "unsichere Möglichkeit" },
-        { q: "You _____ (must) wear a helmet.",                      a: "must",      hint: "Regel oder Gesetz" },
+        { q: "You _____ (can) swim very well.",                     a: "can",        hint: "Modalverb + Grundform" },
+        { q: "She _____ (must) do her homework.",                   a: "must",       hint: "starke Pflicht" },
+        { q: "We _____ (should) help our parents.",                 a: "should",     hint: "Rat geben" },
+        { q: "They _____ (must not) be late.",                      a: "must not",   hint: "Verbot: mustn't" },
+        { q: "I _____ (may) go to the party.",                      a: "may",        hint: "vielleicht dürfen" },
+        { q: "You _____ (should not) eat so much fast food.",       a: "should not", hint: "shouldn't" },
+        { q: "He _____ (can't) play the piano.",                    a: "can't",      hint: "can not" },
+        { q: "We _____ (might) see him tomorrow.",                  a: "might",      hint: "unsichere Möglichkeit" },
+        { q: "You _____ (must) wear a helmet.",                     a: "must",       hint: "Regel oder Gesetz" },
         { q: "Students _____ (must not) use their phones in the exam.", a: "must not", hint: "strenges Verbot" },
-        { q: "You _____ (can) ask your teacher for help.",           a: "can",       hint: "Erlaubnis / Möglichkeit" },
-        { q: "She _____ (should) drink more water.",                 a: "should",    hint: "Gesundheitstipp" }
+        { q: "You _____ (can) ask your teacher for help.",          a: "can",        hint: "Erlaubnis / Möglichkeit" },
+        { q: "She _____ (should) drink more water.",                a: "should",     hint: "Gesundheitstipp" }
       ];
       const items = [];
       let i = 0;
@@ -709,21 +706,21 @@
 
     function generateReportedSpeechPractice() {
       const baseTemplates = [
-        { q: "I am tired. → She said that she _____ tired.",                   a: "was",           hint: "am → was" },
-        { q: "I like football. → He said that he _____ football.",             a: "liked",         hint: "like → liked" },
+        { q: "I am tired. → She said that she _____ tired.",                   a: "was",            hint: "am → was" },
+        { q: "I like football. → He said that he _____ football.",             a: "liked",          hint: "like → liked" },
         { q: "We are going to London. → They said that they _____ going to London.", a: "were",   hint: "are → were" },
-        { q: "I have finished. → She said that she _____ finished.",           a: "had",           hint: "have → had" },
-        { q: "I will help you. → Tom said that he _____ help me.",             a: "would",         hint: "will → would" },
-        { q: "I can swim. → He said that he _____ swim.",                      a: "could",         hint: "can → could" },
-        { q: "I must go now. → She said that she _____ go then.",              a: "had to",        hint: "must → had to" },
-        { q: "We are happy. → They said that they _____ happy.",               a: "were",          hint: "are → were" },
-        { q: "I don't know. → She said that she _____ know.",                  a: "didn't",        hint: "don't → didn't" },
-        { q: "I saw her yesterday. → He said that he had seen her _____.",     a: "the day before",hint: "yesterday → the day before" },
-        { q: "I will see you tomorrow. → She said that she would see me _____.", a: "the next day",hint: "tomorrow → the next day" },
-        { q: "Where do you live? → He asked where I _____.",                   a: "lived",         hint: "do + live → lived" },
-        { q: "Do you like apples? → He asked if I _____ apples.",              a: "liked",         hint: "do you like → if I liked" },
-        { q: "Are you ready? → They asked if I _____ ready.",                  a: "was",           hint: "are → was" },
-        { q: "Can you help me? → He asked if I _____ help him.",               a: "could",         hint: "can → could" }
+        { q: "I have finished. → She said that she _____ finished.",           a: "had",            hint: "have → had" },
+        { q: "I will help you. → Tom said that he _____ help me.",             a: "would",          hint: "will → would" },
+        { q: "I can swim. → He said that he _____ swim.",                      a: "could",          hint: "can → could" },
+        { q: "I must go now. → She said that she _____ go then.",              a: "had to",         hint: "must → had to" },
+        { q: "We are happy. → They said that they _____ happy.",               a: "were",           hint: "are → were" },
+        { q: "I don't know. → She said that she _____ know.",                  a: "didn't",         hint: "don't → didn't" },
+        { q: "I saw her yesterday. → He said that he had seen her _____.",     a: "the day before", hint: "yesterday → the day before" },
+        { q: "I will see you tomorrow. → She said that she would see me _____.", a: "the next day", hint: "tomorrow → the next day" },
+        { q: "Where do you live? → He asked where I _____.",                   a: "lived",          hint: "do + live → lived" },
+        { q: "Do you like apples? → He asked if I _____ apples.",              a: "liked",          hint: "do you like → if I liked" },
+        { q: "Are you ready? → They asked if I _____ ready.",                  a: "was",            hint: "are → was" },
+        { q: "Can you help me? → He asked if I _____ help him.",               a: "could",          hint: "can → could" }
       ];
       const items = [];
       let i = 0;
@@ -1543,8 +1540,8 @@
                           ? "bg-blue-100 text-blue-600"
                           : "bg-green-100 text-green-600"
                       }">
-                         ${item.type === "neg" ? "Verneinung" : item.type === "ques" ? "Frage" : "Aussage"}
-                       </div>`
+                          ${item.type === "neg" ? "Verneinung" : item.type === "ques" ? "Frage" : "Aussage"}
+                        </div>`
                     : ""
                 }
                 <p class="whitespace-pre-line text-lg mb-3 font-medium text-slate-700 leading-relaxed pr-8">${item.q}</p>
@@ -1693,5 +1690,3 @@
   </script>
 </body>
 </html>
-
-
