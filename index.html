@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TenseMaster Pro</title>
+    <title>TenseMaster Pro (Grammar Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
@@ -28,374 +28,811 @@
 </head>
 <body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden">
 
-    <header class="bg-white shadow-sm z-20 flex-none">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-primary tracking-tight flex items-center gap-2">
-                <span class="material-symbols-outlined">school</span> TenseMaster
-            </h1>
-            <button onclick="alert('Tipp: Lösche deinen Browser-Cache, wenn du alte Versionen siehst!')" class="text-slate-400 hover:text-primary transition">
-                <span class="material-symbols-outlined">cached</span>
-            </button>
-        </div>
-        
-        <div class="relative border-b border-slate-200 bg-white">
-            <div class="max-w-4xl mx-auto flex overflow-x-auto no-scrollbar py-2 px-2 gap-2" id="nav-container"></div>
-            <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none md:hidden"></div>
-        </div>
-    </header>
+<header class="bg-white shadow-sm z-20 flex-none">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-primary tracking-tight flex items-center gap-2">
+            <span class="material-symbols-outlined">school</span> TenseMaster
+        </h1>
+        <button onclick="window.location.reload()" class="text-slate-400 hover:text-primary transition">
+            <span class="material-symbols-outlined">refresh</span>
+        </button>
+    </div>
+    <div class="relative border-b border-slate-200 bg-white">
+        <div class="max-w-4xl mx-auto flex overflow-x-auto no-scrollbar py-2 px-2 gap-2" id="nav-container"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none md:hidden"></div>
+    </div>
+</header>
 
-    <main class="flex-grow overflow-y-auto p-4" id="main-content"></main>
+<main class="flex-grow overflow-y-auto p-4 relative" id="main-content"></main>
 
-    <div id="table-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all scale-100">
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-lg text-slate-700" id="modal-title">Cheat Sheet</h3>
-                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-100 text-slate-500 hover:text-red-500 transition">
-                    <span class="material-symbols-outlined">close</span>
+<div id="floating-action-container" class="fixed bottom-6 left-4 right-4 z-30 hidden">
+    <button onclick="reloadQuestions()" class="w-full bg-slate-800 text-white shadow-xl py-4 rounded-2xl font-bold active:scale-95 transition flex items-center justify-center gap-2 backdrop-blur-md bg-opacity-90 border border-slate-700/50">
+        <span class="material-symbols-outlined">refresh</span>
+        5 neue Sätze laden
+    </button>
+</div>
+
+<script>
+    // =========================
+    // Hilfsdaten: Subjekte, Verben
+    // =========================
+
+    const subjects = [
+        { label: "I",           bePres: "am",  bePast: "was",  havePres: "have", is3sg: false },
+        { label: "you",         bePres: "are", bePast: "were", havePres: "have", is3sg: false },
+        { label: "he",          bePres: "is",  bePast: "was",  havePres: "has",  is3sg: true  },
+        { label: "she",         bePres: "is",  bePast: "was",  havePres: "has",  is3sg: true  },
+        { label: "it",          bePres: "is",  bePast: "was",  havePres: "has",  is3sg: true  },
+        { label: "we",          bePres: "are", bePast: "were", havePres: "have", is3sg: false },
+        { label: "they",        bePres: "are", bePast: "were", havePres: "have", is3sg: false },
+        { label: "my brother",  bePres: "is",  bePast: "was",  havePres: "has",  is3sg: true  },
+        { label: "my sister",   bePres: "is",  bePast: "was",  havePres: "has",  is3sg: true  },
+        { label: "my parents",  bePres: "are", bePast: "were", havePres: "have", is3sg: false },
+        { label: "the dog",     bePres: "is",  bePast: "was",  havePres: "has",  is3sg: true  },
+        { label: "the children",bePres: "are", bePast: "were", havePres: "have", is3sg: false }
+    ];
+
+    const verbsRegular = [
+        { infLabel: "to play",   base: "play",   past: "played",   pp: "played",   ing: "playing"   },
+        { infLabel: "to watch",  base: "watch",  past: "watched",  pp: "watched",  ing: "watching"  },
+        { infLabel: "to open",   base: "open",   past: "opened",   pp: "opened",   ing: "opening"   },
+        { infLabel: "to clean",  base: "clean",  past: "cleaned",  pp: "cleaned",  ing: "cleaning"  },
+        { infLabel: "to visit",  base: "visit",  past: "visited",  pp: "visited",  ing: "visiting"  },
+        { infLabel: "to walk",   base: "walk",   past: "walked",   pp: "walked",   ing: "walking"   },
+        { infLabel: "to talk",   base: "talk",   past: "talked",   pp: "talked",   ing: "talking"   },
+        { infLabel: "to help",   base: "help",   past: "helped",   pp: "helped",   ing: "helping"   },
+        { infLabel: "to study",  base: "study",  past: "studied",  pp: "studied",  ing: "studying"  },
+        { infLabel: "to start",  base: "start",  past: "started",  pp: "started",  ing: "starting"  }
+    ];
+
+    const verbsIrregular = [
+        { infLabel: "to go",    base: "go",    past: "went",  pp: "gone",   ing: "going"   },
+        { infLabel: "to have",  base: "have",  past: "had",   pp: "had",    ing: "having"  },
+        { infLabel: "to do",    base: "do",    past: "did",   pp: "done",   ing: "doing"   },
+        { infLabel: "to eat",   base: "eat",   past: "ate",   pp: "eaten",  ing: "eating"  },
+        { infLabel: "to see",   base: "see",   past: "saw",   pp: "seen",   ing: "seeing"  },
+        { infLabel: "to make",  base: "make",  past: "made",  pp: "made",   ing: "making"  },
+        { infLabel: "to take",  base: "take",  past: "took",  pp: "taken",  ing: "taking"  },
+        { infLabel: "to come",  base: "come",  past: "came",  pp: "come",   ing: "coming"  },
+        { infLabel: "to buy",   base: "buy",   past: "bought",pp: "bought", ing: "buying"  },
+        { infLabel: "to write", base: "write", past: "wrote", pp: "written",ing: "writing" }
+    ];
+
+    const verbsAll = verbsRegular.concat(verbsIrregular);
+
+    function present3sg(verb) {
+        if (verb.endsWith("y") && !"aeiou".includes(verb[verb.length - 2])) {
+            return verb.slice(0, -1) + "ies";
+        }
+        if (["ch","sh","s","x","z","o"].some(end => verb.endsWith(end))) {
+            return verb + "es";
+        }
+        return verb + "s";
+    }
+
+    // =========================
+    // Generator: Simple Present
+    // =========================
+    function generateSimplePresentPractice() {
+        const items = [];
+        const endings = ["after school.", "every day.", "on Mondays.", "in the morning.", "in the evening.", "at the weekend."];
+
+        // positive (34)
+        let i = 0;
+        while (items.length < 34) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsRegular[i % verbsRegular.length];
+            const ending = endings[i % endings.length];
+            const base = verb.base;
+            let ans, hint;
+            if (subj.is3sg) {
+                ans = present3sg(base);
+                hint = "He/She/It -> +s";
+            } else {
+                ans = base;
+                hint = "Grundform";
+            }
+            const q = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
+            items.push({ type: "pos", q, a: ans, hint });
+            i++;
+        }
+
+        // negative (33)
+        i = 0;
+        while (items.length < 34 + 33) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsRegular[(i + 2) % verbsRegular.length];
+            const ending = endings[(i + 3) % endings.length];
+            const base = verb.base;
+            let aux, hint;
+            if (subj.is3sg) {
+                aux = "doesn't";
+                hint = "He/She/It -> doesn't + Grundform";
+            } else {
+                aux = "don't";
+                hint = "don't + Grundform";
+            }
+            const q = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
+            const ans = `${aux} ${base}`;
+            items.push({ type: "neg", q, a: ans, hint });
+            i++;
+        }
+
+        // questions (33)
+        i = 0;
+        const qEndings = ["after school?", "every day?", "on Mondays?", "in the morning?", "in the evening?", "at the weekend?"];
+        while (items.length < 100) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsRegular[(i + 4) % verbsRegular.length];
+            const base = verb.base;
+            let aux, hint;
+            if (subj.is3sg) {
+                aux = "Does";
+                hint = "Does + Person + Grundform";
+            } else {
+                aux = "Do";
+                hint = "Do + Person + Grundform";
+            }
+            const q = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
+            const ans = `${aux} ${subj.label} ${base}`;
+            items.push({ type: "ques", q, a: ans, hint });
+            i++;
+        }
+
+        return items;
+    }
+
+    // =========================
+    // Generator: Simple Past
+    // =========================
+    function generateSimplePastPractice() {
+        const items = [];
+        const endings = ["yesterday.", "last week.", "last year.", "two days ago.", "in 2019.", "an hour ago."];
+
+        // positive (34)
+        let i = 0;
+        while (items.length < 34) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[i % verbsAll.length];
+            const ending = endings[i % endings.length];
+            const q = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
+            const ans = verb.past;
+            const hint = `${verb.base} -> ${verb.past}`;
+            items.push({ type: "pos", q, a: ans, hint });
+            i++;
+        }
+
+        // negative (33)
+        i = 0;
+        while (items.length < 34 + 33) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[(i + 3) % verbsAll.length];
+            const endingRaw = endings[(i + 2) % endings.length];
+            const ending = endingRaw.replace(".", "");
+            const q = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}.`;
+            const ans = `didn't ${verb.base}`;
+            const hint = "didn't + Grundform";
+            items.push({ type: "neg", q, a: ans, hint });
+            i++;
+        }
+
+        // questions (33)
+        i = 0;
+        const qEndings = ["yesterday?", "last week?", "last night?", "two days ago?", "on Monday?", "in 2019?"];
+        while (items.length < 100) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[(i + 5) % verbsAll.length];
+            const q = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
+            const ans = `Did ${subj.label} ${verb.base}`;
+            const hint = "Did + Person + Grundform";
+            items.push({ type: "ques", q, a: ans, hint });
+            i++;
+        }
+
+        return items;
+    }
+
+    // =========================
+    // Generator: Present Progressive
+    // =========================
+    function generatePresentProgressivePractice() {
+        const items = [];
+        const verbs = verbsRegular.slice(0, 6);
+        const endings = ["now.", "at the moment.", "right now.", "today.", "this morning.", "this evening."];
+
+        // positive
+        let i = 0;
+        while (items.length < 34) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbs[i % verbs.length];
+            const ending = endings[i % endings.length];
+            const be = subj.bePres;
+            const ing = verb.ing;
+            const q = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
+            const ans = `${be} ${ing}`;
+            let hint;
+            if (be === "am") hint = "am + Verb-ing";
+            else if (be === "is") hint = "is + Verb-ing";
+            else hint = "are + Verb-ing";
+            items.push({ type: "pos", q, a: ans, hint });
+            i++;
+        }
+
+        // negative
+        i = 0;
+        while (items.length < 34 + 33) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbs[(i + 2) % verbs.length];
+            const ending = endings[(i + 1) % endings.length];
+            let aux, hint;
+            if (subj.bePres === "am") { aux = "am not"; hint = "am not + Verb-ing"; }
+            else if (subj.bePres === "is") { aux = "isn't"; hint = "isn't + Verb-ing"; }
+            else { aux = "aren't"; hint = "aren't + Verb-ing"; }
+            const q = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
+            const ans = `${aux} ${verb.ing}`;
+            items.push({ type: "neg", q, a: ans, hint });
+            i++;
+        }
+
+        // questions
+        i = 0;
+        const qEndings = ["now?", "at the moment?", "right now?", "today?", "this morning?", "this evening?"];
+        while (items.length < 100) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbs[(i + 4) % verbs.length];
+            let aux;
+            if (subj.bePres === "am") aux = "Am";
+            else if (subj.bePres === "is") aux = "Is";
+            else aux = "Are";
+            const q = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
+            const ans = `${aux} ${subj.label} ${verb.ing}`;
+            const hint = `${aux} + Person + Verb-ing`;
+            items.push({ type: "ques", q, a: ans, hint });
+            i++;
+        }
+
+        return items;
+    }
+
+    // =========================
+    // Generator: Past Progressive
+    // =========================
+    function generatePastProgressivePractice() {
+        const items = [];
+        const verbs = verbsRegular.slice(0, 6);
+        const endings = ["yesterday at 5.", "when he called.", "while it rained.", "all evening.", "all day.", "at that moment."];
+
+        // positive
+        let i = 0;
+        while (items.length < 34) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbs[i % verbs.length];
+            const ending = endings[i % endings.length];
+            const be = subj.bePast;
+            const q = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
+            const ans = `${be} ${verb.ing}`;
+            const hint = `${be} + Verb-ing`;
+            items.push({ type: "pos", q, a: ans, hint });
+            i++;
+        }
+
+        // negative
+        i = 0;
+        while (items.length < 34 + 33) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbs[(i + 2) % verbs.length];
+            const ending = endings[(i + 1) % endings.length];
+            const aux = subj.bePast === "was" ? "wasn't" : "weren't";
+            const q = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
+            const ans = `${aux} ${verb.ing}`;
+            const hint = `${aux} + Verb-ing`;
+            items.push({ type: "neg", q, a: ans, hint });
+            i++;
+        }
+
+        // questions
+        i = 0;
+        const qEndings = ["yesterday at 5?", "when he called?", "while it rained?", "all evening?", "all day?", "at that moment?"];
+        while (items.length < 100) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbs[(i + 4) % verbs.length];
+            const aux = subj.bePast === "was" ? "Was" : "Were";
+            const q = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
+            const ans = `${aux} ${subj.label} ${verb.ing}`;
+            const hint = `${aux} + Person + Verb-ing`;
+            items.push({ type: "ques", q, a: ans, hint });
+            i++;
+        }
+
+        return items;
+    }
+
+    // =========================
+    // Generator: Will-Future
+    // =========================
+    function generateWillFuturePractice() {
+        const items = [];
+        const endings = ["tomorrow.", "next week.", "next month.", "soon.", "later.", "this evening."];
+
+        let i = 0;
+        // positive
+        while (items.length < 34) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[i % verbsAll.length];
+            const ending = endings[i % endings.length];
+            const q = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
+            const ans = `will ${verb.base}`;
+            const hint = "will + Grundform";
+            items.push({ type: "pos", q, a: ans, hint });
+            i++;
+        }
+
+        // negative
+        i = 0;
+        while (items.length < 34 + 33) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[(i + 3) % verbsAll.length];
+            const ending = endings[(i + 1) % endings.length];
+            const q = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
+            const ans = `won't ${verb.base}`;
+            const hint = "won't + Grundform";
+            items.push({ type: "neg", q, a: ans, hint });
+            i++;
+        }
+
+        // questions
+        i = 0;
+        const qEndings = ["tomorrow?", "next week?", "next month?", "soon?", "later?", "this evening?"];
+        while (items.length < 100) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[(i + 5) % verbsAll.length];
+            const q = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
+            const ans = `Will ${subj.label} ${verb.base}`;
+            const hint = "Will + Person + Grundform";
+            items.push({ type: "ques", q, a: ans, hint });
+            i++;
+        }
+
+        return items;
+    }
+
+    // =========================
+    // Generator: Going-to-Future
+    // =========================
+    function generateGoingToFuturePractice() {
+        const items = [];
+        const endings = ["tomorrow.", "next week.", "next month.", "soon.", "later.", "this afternoon."];
+
+        let i = 0;
+        // positive
+        while (items.length < 34) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[i % verbsAll.length];
+            const ending = endings[i % endings.length];
+            const be = subj.bePres;
+            const q = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
+            const ans = `${be} going to ${verb.base}`;
+            const hint = "am/is/are going to + Grundform";
+            items.push({ type: "pos", q, a: ans, hint });
+            i++;
+        }
+
+        // negative
+        i = 0;
+        while (items.length < 34 + 33) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[(i + 3) % verbsAll.length];
+            const ending = endings[(i + 1) % endings.length];
+            let aux;
+            if (subj.bePres === "am") aux = "am not going to";
+            else if (subj.bePres === "is") aux = "isn't going to";
+            else aux = "aren't going to";
+            const q = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
+            const ans = `${aux} ${verb.base}`;
+            const hint = "am/is/are not going to + Grundform";
+            items.push({ type: "neg", q, a: ans, hint });
+            i++;
+        }
+
+        // questions
+        i = 0;
+        const qEndings = ["tomorrow?", "next week?", "next month?", "soon?", "later?", "this afternoon?"];
+        while (items.length < 100) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[(i + 5) % verbsAll.length];
+            let aux;
+            if (subj.bePres === "am") aux = "Am";
+            else if (subj.bePres === "is") aux = "Is";
+            else aux = "Are";
+            const q = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
+            const ans = `${aux} ${subj.label} going to ${verb.base}`;
+            const hint = "Am/Is/Are + Person + going to + Grundform";
+            items.push({ type: "ques", q, a: ans, hint });
+            i++;
+        }
+
+        return items;
+    }
+
+    // =========================
+    // Generator: Present Perfect
+    // =========================
+    function generatePresentPerfectPractice() {
+        const items = [];
+        const endingsPos = ["already.", "just now.", "today.", "this week.", "many times.", "before."];
+        const endingsNeg = ["yet.", "today.", "this week.", "so far.", "before.", "this year."];
+
+        let i = 0;
+        // positive
+        while (items.length < 34) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[i % verbsAll.length];
+            const ending = endingsPos[i % endingsPos.length];
+            const aux = subj.havePres;
+            const q = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
+            const ans = `${aux} ${verb.pp}`;
+            const hint = `${aux} + 3. Form`;
+            items.push({ type: "pos", q, a: ans, hint });
+            i++;
+        }
+
+        // negative
+        i = 0;
+        while (items.length < 34 + 33) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[(i + 3) % verbsAll.length];
+            const ending = endingsNeg[i % endingsNeg.length];
+            const aux = subj.havePres === "has" ? "hasn't" : "haven't";
+            const q = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
+            const ans = `${aux} ${verb.pp}`;
+            const hint = `${aux} + 3. Form`;
+            items.push({ type: "neg", q, a: ans, hint });
+            i++;
+        }
+
+        // questions
+        i = 0;
+        const qEndings = ["yet?", "today?", "this week?", "before?", "so far?", "this year?"];
+        while (items.length < 100) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[(i + 5) % verbsAll.length];
+            const aux = subj.havePres === "has" ? "Has" : "Have";
+            const q = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
+            const ans = `${aux} ${subj.label} ${verb.pp}`;
+            const hint = `${aux} + Person + 3. Form`;
+            items.push({ type: "ques", q, a: ans, hint });
+            i++;
+        }
+
+        return items;
+    }
+
+    // =========================
+    // Generator: Past Perfect
+    // =========================
+    function generatePastPerfectPractice() {
+        const items = [];
+        const endingsPos = ["before I arrived.", "when the film started.", "before lunch.", "by 6 o'clock.", "before the test.", "when he called."];
+        const endingsNeg = ["before I arrived.", "before the lesson.", "before lunch.", "by 6 o'clock.", "before the test.", "when he called."];
+
+        let i = 0;
+        // positive
+        while (items.length < 34) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[i % verbsAll.length];
+            const ending = endingsPos[i % endingsPos.length];
+            const q = `${subj.label} _____ (${verb.infLabel}) ${ending}`;
+            const ans = `had ${verb.pp}`;
+            const hint = "had + 3. Form";
+            items.push({ type: "pos", q, a: ans, hint });
+            i++;
+        }
+
+        // negative
+        i = 0;
+        while (items.length < 34 + 33) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[(i + 3) % verbsAll.length];
+            const ending = endingsNeg[i % endingsNeg.length];
+            const q = `${subj.label} _____ (not / ${verb.infLabel}) ${ending}`;
+            const ans = `hadn't ${verb.pp}`;
+            const hint = "hadn't + 3. Form";
+            items.push({ type: "neg", q, a: ans, hint });
+            i++;
+        }
+
+        // questions
+        i = 0;
+        const qEndings = ["before I arrived?", "before the film started?", "before lunch?", "by 6 o'clock?", "before the test?", "when he called?"];
+        while (items.length < 100) {
+            const subj = subjects[i % subjects.length];
+            const verb = verbsAll[(i + 5) % verbsAll.length];
+            const q = `_____ (${verb.infLabel} / ${subj.label}) ${qEndings[i % qEndings.length]}`;
+            const ans = `Had ${subj.label} ${verb.pp}`;
+            const hint = "Had + Person + 3. Form";
+            items.push({ type: "ques", q, a: ans, hint });
+            i++;
+        }
+
+        return items;
+    }
+
+    // =========================
+    // Alle Practice-Pools erzeugen
+    // =========================
+    const practicePools = {
+        "simple-present": generateSimplePresentPractice(),
+        "simple-past": generateSimplePastPractice(),
+        "present-progressive": generatePresentProgressivePractice(),
+        "past-progressive": generatePastProgressivePractice(),
+        "will-future": generateWillFuturePractice(),
+        "going-to-future": generateGoingToFuturePractice(),
+        "present-perfect": generatePresentPerfectPractice(),
+        "past-perfect": generatePastPerfectPractice()
+    };
+
+    // =========================
+    // appData: jede Zeitform mit 100 Aufgaben
+    // =========================
+    const appData = [
+        {
+            id: "simple-present",
+            name: "Simple Present",
+            color: "from-blue-600 to-cyan-500",
+            learn: {
+                intro: "Regelmäßige Handlungen, Fakten, Zustände.",
+                signalWords: ["always", "often", "usually", "sometimes", "never", "every day"],
+                positive: {
+                    rule: "Subjekt + Verb (He/She/It: das 's' muss mit!)",
+                    examples: ["I play football.", "He reads a book.", "She goes to school."]
+                },
+                negative: {
+                    rule: "don't / doesn't + Infinitiv",
+                    examples: ["I don't play football.", "He doesn't read.", "They don't know."]
+                },
+                question: {
+                    rule: "Do / Does + Subjekt + Infinitiv?",
+                    examples: ["Do you play?", "Does he read?", "Do they know?"]
+                }
+            },
+            practice: practicePools["simple-present"]
+        },
+        {
+            id: "simple-past",
+            name: "Simple Past",
+            color: "from-emerald-600 to-teal-500",
+            learn: {
+                intro: "Abgeschlossene Vergangenheit.",
+                signalWords: ["yesterday", "last week", "in 2010", "ago"],
+                positive: {
+                    rule: "Verb + ed (oder 2. Spalte)",
+                    examples: ["I played.", "I went to school.", "He bought a car."]
+                },
+                negative: {
+                    rule: "didn't + Infinitiv (Grundform!)",
+                    examples: ["I didn't play.", "He didn't go (NICHT went!)"]
+                },
+                question: {
+                    rule: "Did + Subjekt + Infinitiv?",
+                    examples: ["Did you play?", "Did he go?"]
+                }
+            },
+            practice: practicePools["simple-past"]
+        },
+        {
+            id: "present-progressive",
+            name: "Present Progressive",
+            color: "from-indigo-600 to-purple-500",
+            learn: {
+                intro: "Was passiert JETZT gerade?",
+                signalWords: ["now", "at the moment", "Look!", "Listen!"],
+                positive: { rule: "am / is / are + ing", examples: ["I am reading.", "He is running."] },
+                negative: { rule: "am not / isn't / aren't + ing", examples: ["I am not reading.", "He isn't running."] },
+                question: { rule: "Am / Is / Are + Subjekt + ing?", examples: ["Are you reading?", "Is he running?"] }
+            },
+            practice: practicePools["present-progressive"]
+        },
+        {
+            id: "will-future",
+            name: "Will Future",
+            color: "from-violet-600 to-fuchsia-600",
+            learn: {
+                intro: "Vorhersagen, Versprechen, Spontanes.",
+                signalWords: ["tomorrow", "think", "hope", "maybe"],
+                positive: { rule: "will + Infinitiv", examples: ["I will help you.", "It will rain."] },
+                negative: { rule: "won't (will not) + Infinitiv", examples: ["I won't go.", "It won't rain."] },
+                question: { rule: "Will + Subjekt + Infinitiv?", examples: ["Will you come?", "Will it rain?"] }
+            },
+            practice: practicePools["will-future"]
+        },
+        {
+            id: "past-progressive",
+            name: "Past Progressive",
+            color: "from-green-600 to-lime-600",
+            learn: {
+                intro: "Handlung dauerte in Vergangenheit an (wurde oft unterbrochen).",
+                signalWords: ["while", "when (Simple Past unterbricht)", "all day"],
+                positive: { rule: "was / were + ing", examples: ["I was sleeping.", "They were playing."] },
+                negative: { rule: "wasn't / weren't + ing", examples: ["I wasn't sleeping.", "They weren't playing."] },
+                question: { rule: "Was / Were + Subjekt + ing?", examples: ["Was he sleeping?", "Were they playing?"] }
+            },
+            practice: practicePools["past-progressive"]
+        },
+        {
+            id: "present-perfect",
+            name: "Present Perfect",
+            color: "from-orange-500 to-amber-500",
+            learn: {
+                intro: "Ergebnis wichtig oder Handlung dauert noch an.",
+                signalWords: ["just", "yet", "never", "ever", "already", "since", "for"],
+                positive: { rule: "have / has + 3. Spalte (ed)", examples: ["I have eaten.", "She has gone."] },
+                negative: { rule: "haven't / hasn't + 3. Spalte", examples: ["I haven't eaten.", "She hasn't gone."] },
+                question: { rule: "Have / Has + Subjekt + 3. Spalte?", examples: ["Have you eaten?", "Has she gone?"] }
+            },
+            practice: practicePools["present-perfect"]
+        },
+        {
+            id: "past-perfect",
+            name: "Past Perfect",
+            color: "from-red-600 to-orange-600",
+            learn: {
+                intro: "Vorvergangenheit. Passierte VOR etwas anderem.",
+                signalWords: ["before", "after"],
+                positive: { rule: "had + 3. Spalte", examples: ["I had eaten before I slept."] },
+                negative: { rule: "hadn't + 3. Spalte", examples: ["I hadn't eaten."] },
+                question: { rule: "Had + Subjekt + 3. Spalte?", examples: ["Had you eaten?"] }
+            },
+            practice: practicePools["past-perfect"]
+        },
+        {
+            id: "going-to-future",
+            name: "Going-to Future",
+            color: "from-pink-600 to-rose-500",
+            learn: {
+                intro: "Feste Pläne oder logische Konsequenz.",
+                signalWords: ["tomorrow", "next week", "planned"],
+                positive: { rule: "am/is/are + going to + Infinitiv", examples: ["I am going to fly.", "He is going to fall."] },
+                negative: { rule: "am not / isn't / aren't + going to + Infinitiv", examples: ["I am not going to fly."] },
+                question: { rule: "Am/Is/Are + Subjekt + going to + Infinitiv?", examples: ["Are you going to fly?"] }
+            },
+            practice: practicePools["going-to-future"]
+        }
+    ];
+
+    // =========================
+    // Restliche App-Logik
+    // =========================
+
+    let currentTenseIndex = 0;
+    let currentMode = "learn";
+    let currentQuestions = [];
+
+    const navContainer = document.getElementById("nav-container");
+    const mainContent = document.getElementById("main-content");
+    const floatingContainer = document.getElementById("floating-action-container");
+
+    function getRandomQuestions(allQuestions, count = 5) {
+        const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
+    }
+
+    window.onload = function() {
+        if (appData.length > 0) {
+            init();
+        } else {
+            document.body.innerHTML = "<div class='p-10 text-red-600 font-bold text-center'>Bitte Schritt 2 (Daten) einfügen!</div>";
+        }
+    };
+
+    function init() {
+        renderNav();
+        renderContent();
+    }
+
+    function renderNav() {
+        navContainer.innerHTML = "";
+        appData.forEach((tense, index) => {
+            const isActive = index === currentTenseIndex;
+            const btn = document.createElement("button");
+            btn.className =
+                "px-5 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap flex-shrink-0 border-2 " +
+                (isActive
+                    ? `bg-gradient-to-r ${tense.color} text-white border-transparent shadow-lg transform scale-105`
+                    : "bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50");
+            btn.textContent = tense.name;
+            btn.onclick = () => {
+                currentTenseIndex = index;
+                currentMode = "learn";
+                currentQuestions = [];
+                renderNav();
+                renderContent();
+            };
+            navContainer.appendChild(btn);
+        });
+    }
+
+    function renderContent() {
+        const data = appData[currentTenseIndex];
+        const practicePool = data.practice; // 100 Sätze
+
+        mainContent.innerHTML = "";
+        const container = document.createElement("div");
+        container.className = "max-w-2xl mx-auto fade-in pb-32";
+
+        const banner = `
+            <div class="rounded-2xl bg-gradient-to-r ${data.color} p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-3xl font-extrabold tracking-tight mb-1">${data.name}</h2>
+                    <p class="opacity-90 font-medium">${data.learn.intro}</p>
+                </div>
+                <span class="material-symbols-outlined absolute -right-4 -bottom-6 text-9xl opacity-20 rotate-12">school</span>
+            </div>
+        `;
+
+        const modeSwitcher = `
+            <div class="bg-white p-1.5 rounded-xl shadow-sm border border-slate-200 mb-6 flex">
+                <button onclick="switchMode('learn')" class="flex-1 py-3 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${currentMode === "learn" ? "bg-slate-100 text-slate-800 shadow-inner" : "text-slate-500 hover:text-slate-700"}">
+                    <span class="material-symbols-outlined">menu_book</span> Lernen
+                </button>
+                <button onclick="switchMode('practice')" class="flex-1 py-3 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${currentMode === "practice" ? "bg-slate-100 text-slate-800 shadow-inner" : "text-slate-500 hover:text-slate-700"}">
+                    <span class="material-symbols-outlined">edit_note</span> Üben
                 </button>
             </div>
-            <div class="p-0 overflow-auto" id="modal-body"></div>
-        </div>
-    </div>
+        `;
 
-    <script>
-        // --- DATA POOL (Erweitert) ---
-        const appData = [
-            {
-                id: 'simple-present',
-                name: 'Simple Present',
-                color: 'from-blue-600 to-cyan-500',
-                learn: {
-                    intro: "Fakten, regelmäßige Handlungen, Zustände.",
-                    signalWords: ["always", "often", "usually", "sometimes", "never", "every day", "on Mondays"],
-                    formation: "Subjekt + Verb (he/she/it: das 's' muss mit!)",
-                    examples: [{ en: "He plays football.", de: "Er spielt Fußball." }, { en: "We go to school.", de: "Wir gehen zur Schule." }]
-                },
-                practice: [ // Hier ist der große Pool
-                    { q: "She _____ (to read) a book every night.", a: "reads", hint: "He/She/It + s" },
-                    { q: "We _____ (to live) in London.", a: "live", hint: "Kein 's' bei we" },
-                    { q: "Tom _____ (to like) pizza.", a: "likes", hint: "Tom = He -> likes" },
-                    { q: "I _____ (to play) tennis on Sundays.", a: "play", hint: "I -> play" },
-                    { q: "The sun _____ (to rise) in the east.", a: "rises", hint: "Sun = It -> rises" },
-                    { q: "Cats _____ (to drink) milk.", a: "drink", hint: "Cats = They -> drink" },
-                    { q: "My brother _____ (to work) at a bank.", a: "works", hint: "Brother = He -> works" },
-                    { q: "You _____ (to speak) English very well.", a: "speak", hint: "" },
-                    { q: "It _____ (to rain) a lot in April.", a: "rains", hint: "It -> rains" },
-                    { q: "They never _____ (to go) to the cinema.", a: "go", hint: "They -> go" },
-                    { q: "Sarah _____ (to love) chocolate.", a: "loves", hint: "" },
-                    { q: "We usually _____ (to eat) dinner at 7.", a: "eat", hint: "" },
-                    { q: "He always _____ (to arrive) late.", a: "arrives", hint: "" },
-                    { q: "The bus _____ (to leave) at 8:00.", a: "leaves", hint: "" },
-                    { q: "I _____ (to hate) spinach.", a: "hate", hint: "" }
-                ],
-                table: { pos: "I play / He plays", neg: "I don't play / He doesn't play", ques: "Do I play? / Does he play?" }
-            },
-            {
-                id: 'present-progressive',
-                name: 'Present Progressive',
-                color: 'from-indigo-600 to-purple-500',
-                learn: {
-                    intro: "Handlungen, die JETZT gerade passieren.",
-                    signalWords: ["now", "at the moment", "Look!", "Listen!", "right now"],
-                    formation: "am / is / are + Verb-ing",
-                    examples: [{ en: "I am writing.", de: "Ich schreibe gerade." }, { en: "Look! He is running.", de: "Schau! Er rennt." }]
-                },
-                practice: [
-                    { q: "Listen! She _____ (to sing) a song.", a: "is singing", hint: "is + ing" },
-                    { q: "They _____ (to play) football right now.", a: "are playing", hint: "are + ing" },
-                    { q: "I _____ (to do) my homework at the moment.", a: "am doing", hint: "am + ing" },
-                    { q: "Look! The bus _____ (to come).", a: "is coming", hint: "" },
-                    { q: "We _____ (to watch) TV now.", a: "are watching", hint: "" },
-                    { q: "He _____ (to read) a book right now.", a: "is reading", hint: "" },
-                    { q: "Be quiet! The baby _____ (to sleep).", a: "is sleeping", hint: "" },
-                    { q: "You _____ (to work) very hard today.", a: "are working", hint: "" },
-                    { q: "Look! The dog _____ (to chase) the cat.", a: "is chasing", hint: "" },
-                    { q: "I _____ (to write) an email.", a: "am writing", hint: "" },
-                    { q: "She _____ (to wear) a nice dress.", a: "is wearing", hint: "" },
-                    { q: "They _____ (to run) in the park.", a: "are running", hint: "" },
-                    { q: "Tom _____ (to eat) a sandwich.", a: "is eating", hint: "" },
-                    { q: "It _____ (to rain) outside.", a: "is raining", hint: "" },
-                    { q: "We _____ (to learn) English now.", a: "are learning", hint: "" }
-                ],
-                table: { pos: "I am playing", neg: "I am not playing", ques: "Am I playing?" }
-            },
-            {
-                id: 'simple-past',
-                name: 'Simple Past',
-                color: 'from-emerald-600 to-teal-500',
-                learn: {
-                    intro: "Abgeschlossene Handlungen in der Vergangenheit.",
-                    signalWords: ["yesterday", "last week", "in 2010", "ago", "last night"],
-                    formation: "Regelmäßig: -ed. Unregelmäßig: 2. Spalte!",
-                    examples: [{ en: "I visited London.", de: "Ich besuchte London." }, { en: "He went home.", de: "Er ging nach Hause." }]
-                },
-                practice: [
-                    { q: "I _____ (to watch) TV yesterday.", a: "watched", hint: "Regelmäßig (+ed)" },
-                    { q: "We _____ (to go) to the park last Sunday.", a: "went", hint: "Unregelmäßig (go -> went)" },
-                    { q: "She _____ (to buy) a new car.", a: "bought", hint: "buy -> bought" },
-                    { q: "Tom _____ (to play) football yesterday.", a: "played", hint: "" },
-                    { q: "They _____ (to visit) their grandma.", a: "visited", hint: "" },
-                    { q: "I _____ (to see) a ghost!", a: "saw", hint: "see -> saw" },
-                    { q: "He _____ (to come) home late.", a: "came", hint: "come -> came" },
-                    { q: "We _____ (to have) a party.", a: "had", hint: "have -> had" },
-                    { q: "You _____ (to break) the window.", a: "broke", hint: "break -> broke" },
-                    { q: "The rain _____ (to stop) an hour ago.", a: "stopped", hint: "stop -> stopped" },
-                    { q: "She _____ (to write) a letter.", a: "wrote", hint: "write -> wrote" },
-                    { q: "I _____ (to walk) to school.", a: "walked", hint: "" },
-                    { q: "They _____ (to eat) pizza.", a: "ate", hint: "eat -> ate" },
-                    { q: "He _____ (to do) his homework.", a: "did", hint: "do -> did" },
-                    { q: "We _____ (to meet) Paul yesterday.", a: "met", hint: "meet -> met" }
-                ],
-                table: { pos: "I played / I went", neg: "I didn't play / I didn't go", ques: "Did I play? / Did I go?" }
-            },
-            {
-                id: 'past-progressive',
-                name: 'Past Progressive',
-                color: 'from-green-600 to-lime-600',
-                learn: {
-                    intro: "Handlungen, die in der Vergangenheit gerade andauerten.",
-                    signalWords: ["while", "when (Simp. Past unterbricht)"],
-                    formation: "was / were + Verb-ing",
-                    examples: [{ en: "I was reading when he came.", de: "Ich las gerade, als er kam." }, { en: "They were playing.", de: "Sie spielten gerade." }]
-                },
-                practice: [
-                    { q: "I _____ (to sleep) when you called.", a: "was sleeping", hint: "I was..." },
-                    { q: "They _____ (to wait) for the bus.", a: "were waiting", hint: "They were..." },
-                    { q: "He _____ (to work) all day yesterday.", a: "was working", hint: "" },
-                    { q: "We _____ (to play) cards when it started to rain.", a: "were playing", hint: "" },
-                    { q: "She _____ (to cook) dinner while he was watching TV.", a: "was cooking", hint: "" },
-                    { q: "It _____ (to snow) when we left.", a: "was snowing", hint: "" },
-                    { q: "You _____ (to listen) to music.", a: "were listening", hint: "" },
-                    { q: "The kids _____ (to run) in the garden.", a: "were running", hint: "" },
-                    { q: "I _____ (to think) about you.", a: "was thinking", hint: "" },
-                    { q: "Tom _____ (to drive) too fast.", a: "was driving", hint: "" },
-                    { q: "They _____ (to talk) about the test.", a: "were talking", hint: "" },
-                    { q: "She _____ (to cry) when I saw her.", a: "was crying", hint: "" },
-                    { q: "We _____ (to walk) down the street.", a: "were walking", hint: "" },
-                    { q: "He _____ (to read) a comic.", a: "was reading", hint: "" }
-                ],
-                table: { pos: "I was playing", neg: "I wasn't playing", ques: "Was I playing?" }
-            },
-            {
-                id: 'present-perfect',
-                name: 'Present Perfect',
-                color: 'from-orange-500 to-amber-500',
-                learn: {
-                    intro: "Ergebnis wichtig oder Handlung dauert noch an (since/for).",
-                    signalWords: ["just", "yet", "never", "ever", "already", "since", "for"],
-                    formation: "have / has + 3. Spalte (Participle)",
-                    examples: [{ en: "I have lost my key.", de: "Ich habe meinen Schlüssel verloren." }, { en: "She has gone.", de: "Sie ist gegangen." }]
-                },
-                practice: [
-                    { q: "I _____ (to finish) my homework.", a: "have finished", hint: "have + ed" },
-                    { q: "She _____ (to be) to London twice.", a: "has been", hint: "has + 3. Spalte" },
-                    { q: "We _____ (to see) that movie already.", a: "have seen", hint: "see -> seen" },
-                    { q: "He _____ (to lose) his phone.", a: "has lost", hint: "lose -> lost" },
-                    { q: "They _____ (to buy) a new house.", a: "have bought", hint: "buy -> bought" },
-                    { q: "I _____ (to live) here for 10 years.", a: "have lived", hint: "" },
-                    { q: "Tom _____ (to just / arrive).", a: "has just arrived", hint: "" },
-                    { q: "We _____ (to never / eat) Sushi.", a: "have never eaten", hint: "eat -> eaten" },
-                    { q: "You _____ (to do) a great job.", a: "have done", hint: "do -> done" },
-                    { q: "She _____ (to write) three books.", a: "has written", hint: "write -> written" },
-                    { q: "I _____ (to forget) your name.", a: "have forgotten", hint: "forget -> forgotten" },
-                    { q: "It _____ (to rain) all day.", a: "has rained", hint: "" },
-                    { q: "They _____ (to clean) the car.", a: "have cleaned", hint: "" },
-                    { q: "He _____ (to break) his leg.", a: "has broken", hint: "break -> broken" }
-                ],
-                table: { pos: "I have played", neg: "I haven't played", ques: "Have I played?" }
-            },
-            {
-                id: 'past-perfect',
-                name: 'Past Perfect',
-                color: 'from-red-600 to-orange-600',
-                learn: {
-                    intro: "Vorvergangenheit. Passierte VOR einer anderen Handlung.",
-                    signalWords: ["before", "after"],
-                    formation: "had + 3. Spalte",
-                    examples: [{ en: "After I had eaten, I slept.", de: "Nachdem ich gegessen hatte, schlief ich." }]
-                },
-                practice: [
-                    { q: "She went home after she _____ (to do) the shopping.", a: "had done", hint: "had + 3. Spalte" },
-                    { q: "The train _____ (to leave) before I arrived.", a: "had left", hint: "had + left" },
-                    { q: "I _____ (to eat) dinner before he called.", a: "had eaten", hint: "eat -> eaten" },
-                    { q: "We realized we _____ (to forget) the tickets.", a: "had forgotten", hint: "" },
-                    { q: "He was tired because he _____ (to work) hard.", a: "had worked", hint: "" },
-                    { q: "They _____ (to finish) the test when the bell rang.", a: "had finished", hint: "" },
-                    { q: "She _____ (to never / see) such a thing before.", a: "had never seen", hint: "" },
-                    { q: "After Tom _____ (to repair) the bike, he rode it.", a: "had repaired", hint: "" },
-                    { q: "I _____ (to lose) my key so I couldn't get in.", a: "had lost", hint: "" },
-                    { q: "They _____ (to be) married for 5 years before they moved.", a: "had been", hint: "" },
-                    { q: "He _____ (to read) the book before he watched the movie.", a: "had read", hint: "" },
-                    { q: "We _____ (to study) English before we went to USA.", a: "had studied", hint: "" }
-                ],
-                table: { pos: "I had played", neg: "I had not played", ques: "Had I played?" }
-            },
-            {
-                id: 'will-future',
-                name: 'Will Future',
-                color: 'from-violet-600 to-fuchsia-600',
-                learn: {
-                    intro: "Spontane Entschlüsse, Vorhersagen, Versprechen.",
-                    signalWords: ["tomorrow", "next year", "I think", "I hope", "maybe"],
-                    formation: "will + Infinitiv",
-                    examples: [{ en: "I think it will rain.", de: "Ich glaube, es wird regnen." }, { en: "I will help you.", de: "Ich werde dir helfen." }]
-                },
-                practice: [
-                    { q: "Wait, I _____ (to help) you.", a: "will help", hint: "Spontan" },
-                    { q: "It _____ (to be) cold tomorrow.", a: "will be", hint: "Vorhersage" },
-                    { q: "I promise I _____ (to call).", a: "will call", hint: "Versprechen" },
-                    { q: "I think he _____ (to win) the game.", a: "will win", hint: "Vermutung (think)" },
-                    { q: "Maybe we _____ (to meet) again.", a: "will meet", hint: "" },
-                    { q: "I hope she _____ (to pass) the exam.", a: "will pass", hint: "Hoffnung" },
-                    { q: "Don't worry, I _____ (to not / tell) anyone.", a: "won't tell", hint: "will not -> won't" },
-                    { q: "The sun _____ (to shine) tomorrow.", a: "will shine", hint: "" },
-                    { q: "People _____ (to live) on Mars one day.", a: "will live", hint: "" },
-                    { q: "I _____ (to have) the steak, please.", a: "will have", hint: "Bestellung (spontan)" },
-                    { q: "He _____ (to be) 15 next month.", a: "will be", hint: "" },
-                    { q: "I think it _____ (to snow).", a: "will snow", hint: "" },
-                    { q: "We _____ (to see) what happens.", a: "will see", hint: "" }
-                ],
-                table: { pos: "I will play", neg: "I won't play", ques: "Will I play?" }
-            },
-            {
-                id: 'going-to-future',
-                name: 'Going-to Future',
-                color: 'from-pink-600 to-rose-500',
-                learn: {
-                    intro: "Feste Pläne oder logische Konsequenz (man sieht es).",
-                    signalWords: ["tomorrow", "next week", "planned"],
-                    formation: "am / is / are + going to + Infinitiv",
-                    examples: [{ en: "I am going to buy a car.", de: "Ich habe vor, ein Auto zu kaufen." }, { en: "Look! It is going to rain.", de: "Es wird gleich regnen." }]
-                },
-                practice: [
-                    { q: "We _____ (to fly) to Spain next week.", a: "are going to fly", hint: "Plan" },
-                    { q: "Look! He _____ (to fall).", a: "is going to fall", hint: "Man sieht es" },
-                    { q: "I _____ (to visit) my aunt on Saturday.", a: "am going to visit", hint: "Plan" },
-                    { q: "Look at the clouds! It _____ (to rain).", a: "is going to rain", hint: "" },
-                    { q: "They _____ (to buy) a new house next year.", a: "are going to buy", hint: "" },
-                    { q: "She _____ (to have) a baby.", a: "is going to have", hint: "" },
-                    { q: "I _____ (to be) a doctor when I grow up.", a: "am going to be", hint: "" },
-                    { q: "Tom _____ (to not / play) football tomorrow.", a: "is not going to play", hint: "" },
-                    { q: "What _____ (you / to wear) to the party?", a: "are you going to wear", hint: "" },
-                    { q: "We _____ (to watch) a movie tonight.", a: "are going to watch", hint: "" },
-                    { q: "He _____ (to sell) his car.", a: "is going to sell", hint: "" },
-                    { q: "Careful! You _____ (to drop) that glass.", a: "are going to drop", hint: "" }
-                ],
-                table: { pos: "I am going to play", neg: "I am not going to play", ques: "Am I going to play?" }
-            }
-        ];
+        let contentHTML = "";
 
-        // --- STATE & LOGIC ---
-        let currentTenseIndex = 0;
-        let currentMode = 'learn';
-        let currentQuestions = []; // Stores the current set of random questions
+        if (currentMode === "learn") {
+            floatingContainer.classList.add("hidden");
 
-        const navContainer = document.getElementById('nav-container');
-        const mainContent = document.getElementById('main-content');
-        const modal = document.getElementById('table-modal');
-        const modalBody = document.getElementById('modal-body');
-        const modalTitle = document.getElementById('modal-title');
-
-        function init() { renderNav(); renderContent(); }
-
-        function renderNav() {
-            navContainer.innerHTML = '';
-            appData.forEach((tense, index) => {
-                const btn = document.createElement('button');
-                const isActive = index === currentTenseIndex;
-                btn.className = `px-5 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap flex-shrink-0 border-2 ${isActive ? `bg-gradient-to-r ${tense.color} text-white border-transparent shadow-lg transform scale-105` : "bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50"}`;
-                btn.textContent = tense.name;
-                btn.onclick = () => { 
-                    currentTenseIndex = index; 
-                    currentMode = 'learn'; 
-                    currentQuestions = []; // Reset questions
-                    renderNav(); 
-                    renderContent(); 
-                };
-                navContainer.appendChild(btn);
-            });
-        }
-
-        // ZUFALLS-LOGIK: Wählt 5 neue Fragen aus dem Pool
-        function getRandomQuestions(allQuestions, count = 5) {
-            const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count);
-        }
-
-        function renderContent() {
-            const data = appData[currentTenseIndex];
-            mainContent.innerHTML = '';
-            const container = document.createElement('div');
-            container.className = "max-w-2xl mx-auto fade-in pb-24";
-
-            // Header Banner
-            const banner = `
-                <div class="rounded-2xl bg-gradient-to-r ${data.color} p-6 text-white shadow-lg mb-6 relative overflow-hidden">
-                    <div class="relative z-10">
-                        <h2 class="text-3xl font-extrabold tracking-tight mb-1">${data.name}</h2>
-                        <p class="opacity-90 font-medium">${data.learn.intro}</p>
+            const createCard = (title, icon, colorClass, textClass, content, examples) => `
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div class="${colorClass} px-4 py-3 flex items-center gap-2 border-b border-slate-100">
+                        <span class="material-symbols-outlined text-white">${icon}</span>
+                        <span class="font-bold text-white uppercase text-sm tracking-wider">${title}</span>
                     </div>
-                    <span class="material-symbols-outlined absolute -right-4 -bottom-6 text-9xl opacity-20 rotate-12">school</span>
+                    <div class="p-5">
+                        <p class="font-mono text-lg font-medium ${textClass} mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">${content}</p>
+                        <div class="space-y-2">
+                            ${examples.map(ex => `<div class="text-slate-600 text-sm flex gap-2"><span class="text-slate-400">•</span> ${ex}</div>`).join("")}
+                        </div>
+                    </div>
                 </div>
             `;
 
-            // Tabs
-            const modeSwitcher = `
-                <div class="bg-white p-1.5 rounded-xl shadow-sm border border-slate-200 mb-6 flex">
-                    <button onclick="switchMode('learn')" class="flex-1 py-3 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${currentMode === 'learn' ? 'bg-slate-100 text-slate-800 shadow-inner' : 'text-slate-500 hover:text-slate-700'}">
-                        <span class="material-symbols-outlined">menu_book</span> Lernen
-                    </button>
-                    <button onclick="switchMode('practice')" class="flex-1 py-3 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${currentMode === 'practice' ? 'bg-slate-100 text-slate-800 shadow-inner' : 'text-slate-500 hover:text-slate-700'}">
-                        <span class="material-symbols-outlined">edit_note</span> Üben
-                    </button>
-                </div>
-            `;
+            contentHTML = `
+                <div class="space-y-6">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-3">Signalwörter</h3>
+                        <div class="flex flex-wrap gap-2">
+                            ${data.learn.signalWords.map(w => `<span class="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-semibold border border-slate-200">${w}</span>`).join("")}
+                        </div>
+                    </div>
 
-            let contentHTML = "";
+                    ${createCard("Aussage", "add_circle", "bg-green-500", "text-green-700", data.learn.positive.rule, data.learn.positive.examples)}
+                    ${createCard("Verneinung", "cancel", "bg-red-500", "text-red-700", data.learn.negative.rule, data.learn.negative.examples)}
+                    ${createCard("Frage", "help", "bg-blue-500", "text-blue-700", data.learn.question.rule, data.learn.question.examples)}
+                </div>`;
+        } else {
+            if (currentQuestions.length === 0) {
+                currentQuestions = getRandomQuestions(practicePool, 5);
+            }
+            floatingContainer.classList.remove("hidden");
 
-            if (currentMode === 'learn') {
-                contentHTML = `
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
-                        <div>
-                            <h3 class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-3">Signalwörter</h3>
-                            <div class="flex flex-wrap gap-2">
-                                ${data.learn.signalWords.map(w => `<span class="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-semibold border border-slate-200">${w}</span>`).join('')}
+            contentHTML = `
+                <div class="space-y-4">
+                    <div class="text-right text-xs text-slate-400 font-medium">Pool: ${practicePool.length} Sätze</div>
+                    ${currentQuestions.map((item, idx) => `
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-bl-xl ${
+                                item.type === "neg" ? "bg-red-100 text-red-600" :
+                                item.type === "ques" ? "bg-blue-100 text-blue-600" :
+                                "bg-green-100 text-green-600"
+                            }">
+                                ${item.type === "neg" ? "Verneinung" : item.type === "ques" ? "Frage" : "Aussage"}
                             </div>
-                        </div>
-                        <div class="bg-blue-50/50 p-5 rounded-xl border border-blue-100">
-                            <h3 class="text-xs uppercase tracking-wider text-blue-400 font-bold mb-2">Bildung</h3>
-                            <p class="font-mono text-blue-700 text-lg font-medium">${data.learn.formation}</p>
-                        </div>
-                        <div>
-                            <h3 class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-3">Beispiele</h3>
-                            <div class="space-y-3">
-                                ${data.learn.examples.map(ex => `
-                                    <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition border border-transparent hover:border-slate-100">
-                                        <span class="material-symbols-outlined text-green-500 mt-0.5">check_circle</span>
-                                        <div>
-                                            <p class="font-bold text-slate-800 text-lg">${ex.en}</p>
-                                            <p class="text-slate-500 italic">${ex.de}</p>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        <button onclick="openTable()" class="w-full mt-4 bg-slate-800 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition hover:bg-slate-700">
-                            <span class="material-symbols-outlined text-yellow-400">table_view</span>
-                            Cheat Sheet öffnen
-                        </button>
-                    </div>`;
-            } else {
-                // Initialize questions if empty
-                if (currentQuestions.length === 0) {
-                    currentQuestions = getRandomQuestions(data.practice, 5);
-                }
 
-                contentHTML = `
-                    <div class="space-y-4">
-                        ${currentQuestions.map((item, idx) => `
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500">
-                            <p class="text-lg mb-3 font-medium text-slate-700 leading-relaxed">${item.q}</p>
+                            <p class="text-lg mb-3 font-medium text-slate-700 leading-relaxed pr-8">${item.q}</p>
                             <div class="flex gap-2">
                                 <input type="text" id="input-${idx}" class="min-w-0 flex-1 bg-slate-50 border border-slate-300 rounded-xl p-3 text-lg outline-none focus:bg-white transition" placeholder="Antwort..." autocomplete="off">
                                 <button onclick="checkAnswer(${idx}, '${item.a.replace(/'/g, "\\'")}')" class="bg-slate-800 text-white px-5 rounded-xl font-bold shadow-md hover:bg-slate-700 active:scale-95 transition">
@@ -403,81 +840,45 @@
                                 </button>
                             </div>
                             <div id="feedback-${idx}" class="mt-3 hidden animate-pulse"></div>
-                            ${item.hint ? `<button class="text-xs text-slate-400 mt-3 font-semibold hover:text-primary transition flex items-center gap-1" onclick="this.innerText='💡 ${item.hint}'"><span class="material-symbols-outlined text-sm">lightbulb</span> Tipp?</button>` : ''}
+                            ${item.hint ? `<button class="text-xs text-slate-400 mt-3 font-semibold hover:text-primary transition flex items-center gap-1" onclick="this.innerText='💡 ${item.hint}'"><span class="material-symbols-outlined text-sm">lightbulb</span> Tipp?</button>` : ""}
                         </div>
-                        `).join('')}
-                        
-                        <div class="pt-6 pb-12 flex flex-col gap-3">
-                            <button onclick="reloadQuestions()" class="w-full bg-white border-2 border-slate-200 text-slate-600 py-4 rounded-xl font-bold hover:bg-slate-50 active:scale-95 transition flex items-center justify-center gap-2">
-                                <span class="material-symbols-outlined">refresh</span>
-                                5 neue Übungen laden
-                            </button>
-                        </div>
-                    </div>`;
-            }
-
-            container.innerHTML = banner + modeSwitcher + contentHTML;
-            mainContent.appendChild(container);
-        }
-
-        function switchMode(mode) { currentMode = mode; renderContent(); }
-        
-        function reloadQuestions() {
-            currentQuestions = []; // Force reset
-            renderContent();
-            // Scroll to top of practice area
-            document.getElementById('main-content').scrollTop = 0;
-        }
-
-        function checkAnswer(idx, correct) {
-            const input = document.getElementById(`input-${idx}`);
-            const feedback = document.getElementById(`feedback-${idx}`);
-            const userVal = input.value.trim();
-            
-            feedback.classList.remove('hidden', 'animate-pulse');
-            
-            // Smarter comparison (ignore standard quotes vs typographics, multiple spaces)
-            const cleanUser = userVal.toLowerCase().replace(/\s+/g, ' ').replace(/’/g, "'");
-            const cleanCorrect = correct.toLowerCase().replace(/\s+/g, ' ').replace(/’/g, "'");
-
-            if (cleanUser === cleanCorrect) {
-                input.className = "min-w-0 flex-1 bg-green-50 border-2 border-green-500 text-green-800 rounded-xl p-3 text-lg outline-none font-medium";
-                feedback.innerHTML = `<div class="bg-green-100 text-green-700 p-2 rounded-lg text-sm font-bold flex items-center gap-2"><span class="material-symbols-outlined">check_circle</span> Richtig!</div>`;
-            } else {
-                input.className = "min-w-0 flex-1 bg-red-50 border-2 border-red-500 text-red-800 rounded-xl p-3 text-lg outline-none font-medium";
-                feedback.innerHTML = `<div class="bg-red-100 text-red-700 p-2 rounded-lg text-sm font-medium flex items-center gap-2"><span class="material-symbols-outlined">cancel</span> Leider falsch. <br>Lösung: <span class="font-bold underline ml-1">${correct}</span></div>`;
-            }
-        }
-
-        function openTable() {
-            const data = appData[currentTenseIndex];
-            modalTitle.textContent = `${data.name}`;
-            modalBody.innerHTML = `
-                <table class="w-full text-left border-collapse">
-                    <tbody class="text-slate-700 divide-y divide-slate-100">
-                        <tr class="bg-green-50/50"><td class="p-4 font-bold text-green-700 w-1/3 flex items-center gap-2"><span class="material-symbols-outlined">add_circle</span> Positiv</td><td class="p-4 text-base font-medium">${data.table.pos}</td></tr>
-                        <tr class="bg-red-50/50"><td class="p-4 font-bold text-red-600 flex items-center gap-2"><span class="material-symbols-outlined">cancel</span> Negativ</td><td class="p-4 text-base font-medium">${data.table.neg}</td></tr>
-                        <tr class="bg-blue-50/50"><td class="p-4 font-bold text-blue-600 flex items-center gap-2"><span class="material-symbols-outlined">help</span> Frage</td><td class="p-4 text-base font-medium">${data.table.ques}</td></tr>
-                    </tbody>
-                </table>
-                <div class="p-6 bg-slate-50 text-slate-500 text-sm text-center">
-                    Tipp: Achte auf die Signalwörter!<br>
-                    <span class="font-mono text-xs mt-2 block">${data.learn.signalWords.join(' • ')}</span>
+                    `).join("")}
                 </div>`;
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.firstElementChild.classList.remove('scale-95', 'opacity-0');
-            }, 10);
         }
-        
-        function closeModal() { 
-            modal.firstElementChild.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => modal.classList.add('hidden'), 200);
-        }
-        
-        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-        init();
-    </script>
+        container.innerHTML = banner + modeSwitcher + contentHTML;
+        mainContent.appendChild(container);
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        currentQuestions = [];
+        renderContent();
+    }
+
+    function reloadQuestions() {
+        currentQuestions = [];
+        renderContent();
+        document.getElementById("main-content").scrollTop = 0;
+    }
+
+    function checkAnswer(idx, correct) {
+        const input = document.getElementById(`input-${idx}`);
+        const feedback = document.getElementById(`feedback-${idx}`);
+        const userVal = input.value.trim();
+        feedback.classList.remove("hidden", "animate-pulse");
+
+        const cleanUser = userVal.toLowerCase().replace(/\s+/g, " ").replace(/’/g, "'");
+        const cleanCorrect = correct.toLowerCase().replace(/\s+/g, " ").replace(/’/g, "'");
+
+        if (cleanUser === cleanCorrect) {
+            input.className = "min-w-0 flex-1 bg-green-50 border-2 border-green-500 text-green-800 rounded-xl p-3 text-lg outline-none font-medium";
+            feedback.innerHTML = `<div class="bg-green-100 text-green-700 p-2 rounded-lg text-sm font-bold flex items-center gap-2"><span class="material-symbols-outlined">check_circle</span> Richtig!</div>`;
+        } else {
+            input.className = "min-w-0 flex-1 bg-red-50 border-2 border-red-500 text-red-800 rounded-xl p-3 text-lg outline-none font-medium";
+            feedback.innerHTML = `<div class="bg-red-100 text-red-700 p-2 rounded-lg text-sm font-medium flex items-center gap-2"><span class="material-symbols-outlined">cancel</span> Leider falsch. <br>Lösung: <span class="font-bold underline ml-1">${correct}</span></div>`;
+        }
+    }
+</script>
 </body>
 </html>
