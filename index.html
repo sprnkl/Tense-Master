@@ -62,14 +62,11 @@
   <div id="floating-action-container" class="fixed bottom-4 left-4 right-4 z-30 hidden">
     <div class="max-w-3xl mx-auto flex flex-col gap-2">
       <div id="tense-filter-bar" class="hidden bg-white border border-slate-200 rounded-2xl shadow-sm px-3 py-2 flex items-center justify-between text-xs">
-        <span class="font-semibold text-slate-500 mr-2">Übungstyp:</span>
-        <div class="flex gap-1">
-          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold" data-filter="all">Alle</button>
-          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold" data-filter="pos">Aussagen</button>
-          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold" data-filter="neg">Verneinungen</button>
-          <button class="filter-btn px-3 py-1 rounded-full border text-[11px] font-semibold" data-filter="ques">Fragen</button>
-        </div>
+        <span class="font-semibold text-slate-500 mr-2">Filter:</span>
+        <div class="flex gap-1 overflow-x-auto no-scrollbar" id="filter-buttons-container">
+          </div>
       </div>
+      
       <button onclick="reloadQuestions()"
               class="w-full bg-slate-800 text-white shadow-xl py-3.5 rounded-2xl font-bold active:scale-95 transition flex items-center justify-center gap-2 backdrop-blur-md bg-opacity-90 border border-slate-700/50">
         <span class="material-symbols-outlined">refresh</span>
@@ -179,9 +176,9 @@
       { base: "try", past: "tried", pp: "tried", ing: "trying", inf: "to try" },
       { base: "turn", past: "turned", pp: "turned", ing: "turning", inf: "to turn" },
       { base: "use", past: "used", pp: "used", ing: "using", inf: "to use", obj: "a computer" },
-      { base: "wait", past: "waited", pp: "waited", ing: "waiting", inf: "to wait", obj: "for the bus" },
+      { base: "wait", past: "waited", pp: "waited", ing: "waiting", inf: "to wait" },
       { base: "walk", past: "walked", pp: "walked", ing: "walking", inf: "to walk" },
-      { base: "watch", past: "watched", pp: "watched", ing: "watching", inf: "to watch", obj: "TV" },
+      { base: "watch", past: "watched", pp: "watched", ing: "watching", inf: "to watch" },
       { base: "work", past: "worked", pp: "worked", ing: "working", inf: "to work" }
     ];
 
@@ -1396,12 +1393,14 @@
     const mainContent  = document.getElementById("main-content");
     const floatingContainer = document.getElementById("floating-action-container");
     const filterBar = document.getElementById("tense-filter-bar");
+    const filterButtonsContainer = document.getElementById("filter-buttons-container");
 
     function getRandomQuestionsFromPool(data) {
       const practicePool = data.practice;
       let pool = practicePool;
 
-      if (data.isTense && currentPracticeFilter !== "all") {
+      // Filter anwenden für Tenses oder If-Clauses
+      if ((data.isTense || data.id === 'if-clauses') && currentPracticeFilter !== "all") {
         const filtered = practicePool.filter(item => item.type === currentPracticeFilter);
         if (filtered.length >= 5) pool = filtered;
       }
@@ -1436,11 +1435,59 @@
           currentTenseIndex = index;
           currentMode = "learn";
           currentQuestions = [];
-          currentPracticeFilter = "all";
+          currentPracticeFilter = "all"; // Reset filter on switch
           renderNav();
           renderContent();
         };
         navContainer.appendChild(btn);
+      });
+    }
+
+    function updateFilterBarUI() {
+      const data = appData[currentTenseIndex];
+      filterButtonsContainer.innerHTML = ""; // Clear existing buttons
+
+      let filters = [];
+
+      if (data.isTense) {
+        // Standard Tense Filters
+        filters = [
+          { label: "Alle", val: "all" },
+          { label: "Aussagen", val: "pos" },
+          { label: "Verneinungen", val: "neg" },
+          { label: "Fragen", val: "ques" }
+        ];
+      } else if (data.id === 'if-clauses') {
+        // Special If-Clause Filters
+        filters = [
+          { label: "Alle", val: "all" },
+          { label: "Typ 1", val: "type1" },
+          { label: "Typ 2", val: "type2" },
+          { label: "Typ 3", val: "type3" }
+        ];
+      } else {
+        // No filters for other topics
+        filterBar.classList.add("hidden");
+        return;
+      }
+
+      // Render buttons
+      filterBar.classList.remove("hidden");
+      filters.forEach(f => {
+        const btn = document.createElement("button");
+        const isActive = currentPracticeFilter === f.val;
+        btn.className = `px-3 py-1 rounded-full border text-[11px] font-semibold whitespace-nowrap transition-colors ${
+          isActive 
+            ? "bg-slate-800 text-white border-slate-800" 
+            : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
+        }`;
+        btn.textContent = f.label;
+        btn.onclick = () => {
+          currentPracticeFilter = f.val;
+          currentQuestions = []; // Reset questions to force reload
+          renderContent();
+        };
+        filterButtonsContainer.appendChild(btn);
       });
     }
 
@@ -1481,7 +1528,8 @@
 
       if (currentMode === "learn") {
         floatingContainer.classList.add("hidden");
-        filterBar.classList.add("hidden");
+        // Hide filter bar in learn mode
+        filterBar.classList.add("hidden"); 
 
         const createCard = (block, icon, colorClass, textClass) => `
           <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
@@ -1513,13 +1561,9 @@
         `;
       } else {
         floatingContainer.classList.remove("hidden");
-
-        if (data.isTense) {
-          filterBar.classList.remove("hidden");
-          updateFilterButtons();
-        } else {
-          filterBar.classList.add("hidden");
-        }
+        
+        // Update Filter UI Logic
+        updateFilterBarUI();
 
         if (currentQuestions.length === 0) {
           currentQuestions = getRandomQuestionsFromPool(data);
@@ -1532,30 +1576,27 @@
           <div class="space-y-4">
             <div class="flex justify-between items-center text-xs text-slate-400 font-medium">
               <span>Aufgaben im Pool: ${poolSize}</span>
-              ${data.isTense
-                ? `<span>Filter: ${
-                    currentPracticeFilter === "all"
-                      ? "alle Typen"
-                      : currentPracticeFilter === "pos"
-                      ? "nur Aussagen"
-                      : currentPracticeFilter === "neg"
-                      ? "nur Verneinungen"
-                      : "nur Fragen"
-                  }</span>`
+              ${(data.isTense || data.id === 'if-clauses')
+                ? `<span>Filter aktiv: ${currentPracticeFilter.toUpperCase()}</span>`
                 : ""}
             </div>
             ${currentQuestions.map((item, idx) => `
               <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 transition-all focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 relative overflow-hidden">
                 ${
-                  data.isTense
+                  (data.isTense || data.id === 'if-clauses')
                     ? `<div class="absolute top-0 right-0 px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-bl-xl ${
-                        item.type === "neg"
+                        item.type === "neg" || item.type === "type2"
                           ? "bg-red-100 text-red-600"
-                          : item.type === "ques"
+                          : item.type === "ques" || item.type === "type3"
                           ? "bg-blue-100 text-blue-600"
                           : "bg-green-100 text-green-600"
                       }">
-                          ${item.type === "neg" ? "Verneinung" : item.type === "ques" ? "Frage" : "Aussage"}
+                          ${item.type === "neg" ? "Verneinung" 
+                            : item.type === "ques" ? "Frage" 
+                            : item.type === "pos" ? "Aussage"
+                            : item.type === "type1" ? "Typ 1"
+                            : item.type === "type2" ? "Typ 2"
+                            : "Typ 3"}
                         </div>`
                     : ""
                 }
@@ -1599,25 +1640,6 @@
       const data = appData[currentTenseIndex];
       currentQuestions = getRandomQuestionsFromPool(data);
       renderContent();
-    }
-
-    function updateFilterButtons() {
-      const buttons = document.querySelectorAll(".filter-btn");
-      buttons.forEach(btn => {
-        const filter = btn.getAttribute("data-filter");
-        if (filter === currentPracticeFilter) {
-          btn.classList.add("bg-slate-800", "text-white", "border-slate-800");
-          btn.classList.remove("bg-white", "text-slate-600");
-        } else {
-          btn.classList.remove("bg-slate-800", "text-white", "border-slate-800");
-          btn.classList.add("bg-white", "text-slate-600", "border-slate-300");
-        }
-        btn.onclick = () => {
-          currentPracticeFilter = filter;
-          currentQuestions = [];
-          renderContent();
-        };
-      });
     }
 
     function normalizeAnswer(str) {
