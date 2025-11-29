@@ -1550,9 +1550,19 @@ function renderContent() {
                   </button>
                 </div>
                 <div id="feedback-${idx}" class="mt-2 text-sm min-h-[24px]"></div>
-                <div class="mt-1 text-xs text-slate-500 flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[14px]">lightbulb</span> ${item.hint}
+                
+                <div class="mt-2 flex items-center gap-2">
+                   <button onclick="document.getElementById('hint-${idx}').classList.remove('hidden'); this.classList.add('text-amber-500')" 
+                           class="text-slate-400 hover:text-amber-500 transition-colors flex items-center gap-1"
+                           title="Tipp anzeigen">
+                      <span class="material-symbols-outlined text-lg">lightbulb</span>
+                      <span class="text-[10px] uppercase font-bold tracking-wide">Tipp</span>
+                   </button>
+                   <span id="hint-${idx}" class="hidden text-xs text-slate-500 italic fade-in border-l-2 border-amber-200 pl-2">
+                      ${item.hint}
+                   </span>
                 </div>
+
               </div>
             `).join("")}
           </div>
@@ -1659,3 +1669,4 @@ function renderContent() {
   </script>
 </body>
 </html>
+
