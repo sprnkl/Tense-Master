@@ -29,27 +29,45 @@
 </head>
 <body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden">
   
-  <header class="bg-white shadow-sm z-20 flex-none">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center gap-3">
+<header class="bg-white shadow-sm z-20 flex-none">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
+      
+      <div class="flex items-center gap-3 self-start md:self-auto">
         <span class="material-symbols-outlined text-primary text-3xl">school</span>
         <div>
           <h1 class="text-xl font-bold text-primary tracking-tight">Grammar Master</h1>
           <p class="text-xs text-slate-500">Logische Übungssätze (Hand-coded)</p>
         </div>
       </div>
-      <div class="flex items-center gap-3 text-xs">
-        <button onclick="softReset()" class="ml-2 text-slate-400 hover:text-primary transition" title="Ansicht zurücksetzen">
-          <span class="material-symbols-outlined">refresh</span>
+
+      <div class="flex items-center gap-2 text-xs flex-wrap justify-end">
+        
+        <a href="https://vokabelspiele2-hrnuxphzneec8lgser24mx.streamlit.app/" target="_blank"
+           class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-200 text-slate-600 hover:border-primary hover:text-primary hover:bg-blue-50 transition font-medium">
+          <span class="material-symbols-outlined text-base">translate</span> 
+          <span class="hidden sm:inline">Vokabeltrainer</span>
+          <span class="sm:hidden">App</span>
+        </a>
+
+        <a href="https://www.youtube.com/@English_Piranha" target="_blank"
+           class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-200 text-slate-600 hover:border-red-500 hover:text-red-600 hover:bg-red-50 transition font-medium">
+          <span class="material-symbols-outlined text-base">play_circle</span> 
+          <span class="hidden sm:inline">English Piranha</span>
+          <span class="sm:hidden">YouTube</span>
+        </a>
+
+        <button onclick="softReset()" class="ml-1 p-1.5 text-slate-400 hover:text-primary transition rounded-full hover:bg-slate-100" title="Ansicht zurücksetzen">
+          <span class="material-symbols-outlined text-xl">refresh</span>
         </button>
       </div>
+
     </div>
+    
     <div class="relative border-b border-slate-200 bg-white">
-      <div class="max-w-5xl mx-auto flex overflow-x-auto no-scrollbar py-2 px-2 gap-2" id="nav-container"></div>
+      <div class="max-w-6xl mx-auto flex overflow-x-auto no-scrollbar py-2 px-2 gap-2" id="nav-container"></div>
       <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none md:hidden"></div>
     </div>
   </header>
-
   <main class="flex-grow overflow-y-auto p-4 relative" id="main-content"></main>
 
   <div id="floating-action-container" class="fixed bottom-4 left-4 right-4 z-30 hidden">
