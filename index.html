@@ -1536,11 +1536,12 @@ function renderContent() {
         .trim();
     }
 
-    // Erweiterte Normalisierung für Apostrophe und Kurzformen
+// Erweiterte Normalisierung für Apostrophe und Kurzformen
     function canonicalize(str) {
       let s = normalizeAnswer(str);
-      // Apostroph-Variationen ersetzen
-      s = s.replace(/’/g, "'").replace(/´/g, "'");
+      
+      // NEU: Aggressive Ersetzung aller Apostroph-Varianten
+      s = s.replace(/[’‘´`]/g, "'");
       
       const map = {
         "isn't": "is not", "aren't": "are not", "wasn't": "was not", "weren't": "were not",
@@ -1554,7 +1555,6 @@ function renderContent() {
       
       // Nur ganze Wörter ersetzen
       for (const key in map) {
-        // Wortgrenzen beachten, damit "can" nicht in "can't" ersetzt wird
         if (s.includes(key)) {
            s = s.split(key).join(map[key]);
         }
@@ -1609,6 +1609,7 @@ function renderContent() {
   </script>
 </body>
 </html>
+
 
 
 
